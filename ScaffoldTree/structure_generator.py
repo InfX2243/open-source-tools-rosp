@@ -97,7 +97,7 @@ def parse_tree_line(line: str):
         return None, None
 
     # Calculate nesting depth.
-    depth = len(prefix) // 4
+    depth = len(prefix) // 4 + 1
 
     return depth, name
 
