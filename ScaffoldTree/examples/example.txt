@@ -1,0 +1,49 @@
+my-web-app/
+│
+├── src/
+│   ├── components/
+│   │   ├── Button.tsx
+│   │   ├── Modal.tsx
+│   │   └── index.ts
+│   │
+│   ├── pages/
+│   │   ├── Home.tsx
+│   │   ├── About.tsx
+│   │   └── NotFound.tsx
+│   │
+│   ├── styles/
+│   │   ├── globals.css
+│   │   └── variables.css
+│   │
+│   ├── utils/
+│   │   ├── api.ts
+│   │   └── format.ts
+│   │
+│   └── main.tsx
+│
+├── public/
+│   ├── images/
+│   │   └── logo.svg
+│   └── favicon.ico
+│
+├── tests/
+│   ├── components/
+│   │   └── Button.test.tsx
+│   └── utils/
+│       └── format.test.ts
+│
+├── docs/
+│   ├── README.md
+│   └── architecture.md
+│
+├── config/
+│   ├── development.yaml
+│   └── production.yaml
+│
+├── .env
+├── .gitignore
+├── Dockerfile
+├── Makefile
+├── package.json
+├── tsconfig.json
+└── README
