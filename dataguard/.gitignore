@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Testing & Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases & run audits
+*.db
+*.sqlite
+*.sqlite3
+dataguard.db
+
+# Generated reports & audit outputs
+report.html
+*.html_report
+
+# Environments & Virtual Envs
+.env
+.venv/
+env/
+venv/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

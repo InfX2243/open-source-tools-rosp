@@ -1,0 +1,7 @@
+[
+  {"order_id": "ORD-100001", "customer_id": 1, "amount": 149.99, "currency": "USD", "items_count": 3, "status": "completed"},
+  {"order_id": "ORD-100002", "customer_id": 2, "amount": 89.50, "currency": "CAD", "items_count": 1, "status": "shipped"},
+  {"order_id": "ORD-100003", "customer_id": 3, "amount": 299.00, "currency": "GBP", "items_count": 5, "status": "completed"},
+  {"order_id": "ORD-100004", "customer_id": 4, "amount": 45.20, "currency": "USD", "items_count": 2, "status": "pending"},
+  {"order_id": "ORD-100005", "customer_id": 5, "amount": 1250.00, "currency": "EUR", "items_count": 8, "status": "completed"}
+]

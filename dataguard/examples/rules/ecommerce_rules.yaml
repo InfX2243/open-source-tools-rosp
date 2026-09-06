@@ -1,0 +1,47 @@
+# DataGuard Quality Rules: E-Commerce Orders
+dataset: orders.json
+version: "1.0"
+description: "Validation rules for transaction and order records"
+
+thresholds:
+  fail_on: high
+  min_quality_score: 90.0
+
+columns:
+  order_id:
+    type: string
+    required: true
+    unique: true
+    regex: "^ORD-[0-9]{6}$"
+    severity: critical
+
+  customer_id:
+    type: integer
+    required: true
+    min: 1
+    severity: high
+
+  amount:
+    type: float
+    required: true
+    min: 0.01
+    max: 100000.00
+    severity: critical
+
+  currency:
+    type: string
+    required: true
+    allowed: [USD, EUR, GBP, CAD, AUD, JPY]
+    severity: high
+
+  items_count:
+    type: integer
+    required: true
+    min: 1
+    severity: medium
+
+  status:
+    type: string
+    required: true
+    allowed: [completed, shipped, pending, cancelled]
+    severity: high

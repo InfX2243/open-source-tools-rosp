@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "datadiff"
+version = "1.0.0"
+description = "Open-Source Semantic Data Comparison & Change Detection Platform"
+readme = "README.md"
+authors = [{ name = "DataDiff Community" }]
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = [
+    "polars>=0.20.0",
+    "pydantic>=2.0.0",
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.22.0",
+    "pyyaml>=6.0",
+    "sqlalchemy>=2.0.0",
+    "python-multipart>=0.0.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "httpx>=0.24.0",
+]
+
+[project.scripts]
+datadiff = "datadiff.cli.commands:app"
+
+[tool.setuptools.packages.find]
+include = ["datadiff*"]

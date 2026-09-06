@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataDiff — Open-Source Semantic Data Comparison & Change Detection</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <div class="logo-badge">
+                    <i data-lucide="git-compare"></i>
+                </div>
+                <div>
+                    <h1 class="brand-title">DataDiff <span class="badge-tag">v1.0</span></h1>
+                    <p class="brand-subtitle">Semantic Git-Diff for Data, Schemas & Statistics</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="btn-guide-modal" class="btn btn-secondary">
+                    <i data-lucide="book-open"></i> How to Use Guide
+                </button>
+                <a href="/docs" target="_blank" class="btn btn-secondary">
+                    <i data-lucide="file-code"></i> API Specs
+                </a>
+                <a href="https://github.com/InfX2243/open-source-tools-rosp" target="_blank" class="btn btn-github">
+                    <i data-lucide="github"></i> GitHub
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Quick Sample Runner Chips -->
+        <section class="sample-chips-bar">
+            <span class="sample-label"><i data-lucide="sparkles"></i> 1-Click Quick Demos:</span>
+            <button class="chip" onclick="loadSample('customers')">
+                <i data-lucide="users"></i> Customers Migration (v1 &rarr; v2)
+            </button>
+            <button class="chip" onclick="loadSample('orders_etl')">
+                <i data-lucide="shopping-cart"></i> Orders ETL (JSON &rarr; Parquet)
+            </button>
+        </section>
+
+        <!-- Comparison Setup Panel -->
+        <section class="setup-grid">
+            <!-- Source Card -->
+            <div class="card file-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i data-lucide="file-minus" class="icon-source"></i>
+                        <span>Source Dataset (Old / Baseline)</span>
+                    </div>
+                    <span class="badge-source">Baseline A</span>
+                </div>
+                <div class="drop-zone" id="source-drop-zone">
+                    <i data-lucide="upload-cloud" class="upload-icon"></i>
+                    <p class="drop-text">Drag & drop CSV, JSON, or Parquet</p>
+                    <span class="drop-subtext">or click to browse local file</span>
+                    <input type="file" id="source-file-input" class="hidden-input" accept=".csv,.json,.parquet,.tsv">
+                </div>
+                <div id="source-file-info" class="file-info hidden">
+                    <i data-lucide="file-check"></i>
+                    <span id="source-file-name" class="file-name"></span>
+                </div>
+            </div>
+
+            <!-- Target Card -->
+            <div class="card file-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i data-lucide="file-plus" class="icon-target"></i>
+                        <span>Target Dataset (New / Transformed)</span>
+                    </div>
+                    <span class="badge-target">Transformed B</span>
+                </div>
+                <div class="drop-zone" id="target-drop-zone">
+                    <i data-lucide="upload-cloud" class="upload-icon"></i>
+                    <p class="drop-text">Drag & drop CSV, JSON, or Parquet</p>
+                    <span class="drop-subtext">or click to browse local file</span>
+                    <input type="file" id="target-file-input" class="hidden-input" accept=".csv,.json,.parquet,.tsv">
+                </div>
+                <div id="target-file-info" class="file-info hidden">
+                    <i data-lucide="file-check"></i>
+                    <span id="target-file-name" class="file-name"></span>
+                </div>
+            </div>
+
+            <!-- Parameters Card -->
+            <div class="card config-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i data-lucide="sliders" class="icon-cfg"></i>
+                        <span>Comparison Rules</span>
+                    </div>
+                </div>
+                <div class="config-form">
+                    <div class="form-group">
+                        <label for="key-input">Match Key Column(s):</label>
+                        <input type="text" id="key-input" placeholder="e.g. id, customer_id (comma separated)" value="id">
+                    </div>
+                    <div class="form-group">
+                        <label for="ignore-input">Ignore Columns:</label>
+                        <input type="text" id="ignore-input" placeholder="e.g. updated_at, timestamp">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="tolerance-input">Numeric Tolerance:</label>
+                            <input type="number" id="tolerance-input" step="0.001" value="0.0">
+                        </div>
+                        <div class="form-group half checkboxes">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="trim-whitespace" checked> Trim whitespace
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="case-sensitive" checked> Case sensitive
+                            </label>
+                        </div>
+                    </div>
+                    <button id="btn-run-compare" class="btn btn-primary btn-block">
+                        <i data-lucide="play"></i> Compare Datasets
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading Spinner -->
+        <div id="loading-state" class="loading-container hidden">
+            <div class="spinner"></div>
+            <p>Comparing datasets with Polars vectorized engine...</p>
+        </div>
+
+        <!-- Results View -->
+        <section id="results-container" class="results-container hidden">
+            <!-- Summary Metric Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon metric-blue"><i data-lucide="database"></i></div>
+                    <div>
+                        <div class="metric-label">Source vs Target Rows</div>
+                        <div class="metric-val" id="metric-row-counts">0 &rarr; 0</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon metric-green"><i data-lucide="plus-circle"></i></div>
+                    <div>
+                        <div class="metric-label">Added Rows</div>
+                        <div class="metric-val text-green" id="metric-added">+0</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon metric-red"><i data-lucide="minus-circle"></i></div>
+                    <div>
+                        <div class="metric-label">Removed Rows</div>
+                        <div class="metric-val text-red" id="metric-removed">-0</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon metric-yellow"><i data-lucide="edit-3"></i></div>
+                    <div>
+                        <div class="metric-label">Modified Rows</div>
+                        <div class="metric-val text-yellow" id="metric-modified">0</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon metric-indigo" id="gate-icon-box"><i data-lucide="shield-check"></i></div>
+                    <div>
+                        <div class="metric-label">Quality Gate</div>
+                        <div class="metric-val" id="metric-gate">PASSED</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diff Tabs Navigation -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-tab="tab-rows">
+                    <i data-lucide="layers"></i> Row-Level Diff (<span id="count-row-changes">0</span>)
+                </button>
+                <button class="tab-btn" data-tab="tab-schema">
+                    <i data-lucide="columns"></i> Schema Diff (<span id="count-schema-changes">0</span>)
+                </button>
+                <button class="tab-btn" data-tab="tab-stats">
+                    <i data-lucide="bar-chart-2"></i> Statistics & Drift
+                </button>
+                <button class="tab-btn" data-tab="tab-history">
+                    <i data-lucide="history"></i> Run History
+                </button>
+            </div>
+
+            <!-- Tab 1: Row Diff -->
+            <div class="tab-content active" id="tab-rows">
+                <div class="card table-card">
+                    <div class="table-actions">
+                        <div class="filter-chips">
+                            <button class="filter-chip active" data-filter="all">All Changes</button>
+                            <button class="filter-chip" data-filter="modified">Modified Only</button>
+                            <button class="filter-chip" data-filter="added">Added Only</button>
+                            <button class="filter-chip" data-filter="removed">Removed Only</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="diff-table" id="row-diff-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 110px;">Change</th>
+                                    <th style="width: 220px;">Key</th>
+                                    <th>Field-Level Comparison</th>
+                                </tr>
+                            </thead>
+                            <tbody id="row-diff-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Schema Diff -->
+            <div class="tab-content" id="tab-schema">
+                <div class="card table-card">
+                    <div class="card-header">
+                        <h3><i data-lucide="columns"></i> Column & Type Migration Summary</h3>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="diff-table" id="schema-diff-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 120px;">Change Type</th>
+                                    <th>Column Name</th>
+                                    <th>Source Data Type</th>
+                                    <th>Target Data Type</th>
+                                    <th>Status Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schema-diff-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Statistics & Drift -->
+            <div class="tab-content" id="tab-stats">
+                <div class="card table-card">
+                    <div class="card-header">
+                        <h3><i data-lucide="activity"></i> Column Profile Drift & Null Rates</h3>
+                    </div>
+                    <div id="drift-alerts-container"></div>
+                    <div class="table-wrapper">
+                        <table class="diff-table" id="stats-diff-table">
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Source Null %</th>
+                                    <th>Target Null %</th>
+                                    <th>Null Delta</th>
+                                    <th>Source Distinct</th>
+                                    <th>Target Distinct</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stats-diff-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: History -->
+            <div class="tab-content" id="tab-history">
+                <div class="card table-card">
+                    <div class="card-header">
+                        <h3><i data-lucide="history"></i> Past Comparison Runs</h3>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="diff-table" id="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Run ID</th>
+                                    <th>Source</th>
+                                    <th>Target</th>
+                                    <th>Status</th>
+                                    <th>Rows (A &rarr; B)</th>
+                                    <th>Added</th>
+                                    <th>Removed</th>
+                                    <th>Modified</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- User Guide Modal -->
+    <div id="guide-modal" class="modal hidden">
+        <div class="modal-overlay" id="modal-overlay"></div>
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div class="guide-title">
+                    <i data-lucide="book-open"></i>
+                    <h2>DataDiff User Guide & Documentation</h2>
+                </div>
+                <button id="btn-close-modal" class="btn-close"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="guide-section">
+                    <h3>1. What is DataDiff?</h3>
+                    <p><strong>DataDiff</strong> is an open-source semantic dataset comparison and change detection tool inspired by <code>git diff</code>. Instead of raw text lines, DataDiff understands rows, primary keys, schema migrations, and statistical drift across CSV, JSON, and Parquet files.</p>
+                </div>
+                <div class="guide-section">
+                    <h3>2. CLI Commands</h3>
+                    <div class="code-box">
+                        <code># Basic file comparison with a primary key<br>datadiff compare old.csv new.csv --key id<br><br># Compare Parquet datasets with numeric tolerance<br>datadiff compare baseline.parquet current.parquet --key customer_id --tolerance 0.01<br><br># Compare Schemas only<br>datadiff schema old.csv new.csv<br><br># Generate interactive HTML report<br>datadiff compare old.csv new.csv --key id --format html --output report.html<br><br># Start Web UI & REST API<br>datadiff serve --port 8001</code>
+                    </div>
+                </div>
+                <div class="guide-section">
+                    <h3>3. CI/CD Quality Gate Policies</h3>
+                    <p>Configure comparison policies in <code>datadiff.yaml</code> to fail automated CI pipelines when forbidden data drifts occur:</p>
+                    <div class="code-box">
+                        <code>policies:<br>&nbsp;&nbsp;allow_schema_changes: false<br>&nbsp;&nbsp;max_removed_rows: 0<br>&nbsp;&nbsp;max_modified_pct: 10.0<br>&nbsp;&nbsp;max_null_rate_increase: 5.0</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

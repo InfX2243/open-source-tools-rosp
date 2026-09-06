@@ -1,0 +1,200 @@
+.treeContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.treeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: var(--bg-surface-alt);
+  border-bottom: 1px solid var(--border-light);
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.headerIcon {
+  color: var(--color-primary);
+}
+
+.treeControls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.searchWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 8px;
+  color: var(--text-muted);
+}
+
+.searchInput {
+  font-size: 0.78rem;
+  padding: 0.3rem 0.5rem 0.3rem 1.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+  outline: none;
+  width: 150px;
+  transition: width var(--transition-fast), border-color var(--transition-fast);
+}
+
+.searchInput:focus {
+  width: 190px;
+  border-color: var(--color-primary);
+}
+
+.controlBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-fast);
+}
+
+.controlBtn:hover {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary-border);
+}
+
+.treeBody {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  line-height: 1.6rem;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.treeNodeGroup {
+  margin-left: 0.5rem;
+}
+
+.treeNodeRow, .treeNodeHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+
+  &:hover {
+    background-color: var(--bg-tree-hover);
+  }
+
+  &:hover .copyPathBtn {
+    opacity: 1;
+  }
+}
+
+.treeChildren {
+  margin-left: 1.25rem;
+  border-left: 1px dashed var(--border-strong);
+  padding-left: 0.5rem;
+}
+
+.toggleIcon {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.nodeKey {
+  font-weight: 600;
+  color: var(--syntax-key);
+}
+
+.valString { color: var(--syntax-string); word-break: break-all; }
+.valNumber { color: var(--syntax-number); font-weight: 600; }
+.valBoolean { color: var(--syntax-boolean); font-weight: 600; }
+.valNull { color: var(--syntax-null); font-weight: 600; }
+
+.countBadge {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.typeBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  margin-left: 0.25rem;
+}
+
+.string { background-color: #ecfdf5; color: #047857; }
+.number { background-color: #fffbeb; color: #b45309; }
+.boolean { background-color: #f3e8ff; color: #6b21a8; }
+.null { background-color: #fef2f2; color: #b91c1c; }
+.object { background-color: #eff6ff; color: #1d4ed8; }
+.array { background-color: #f0f9ff; color: #0369a1; }
+
+[data-theme="dark"] .string { background-color: #064e3b; color: #6ee7b7; }
+[data-theme="dark"] .number { background-color: #451a03; color: #fcd34d; }
+[data-theme="dark"] .boolean { background-color: #3b0764; color: #c084fc; }
+[data-theme="dark"] .null { background-color: #450a0a; color: #fca5a5; }
+[data-theme="dark"] .object { background-color: #1e3a8a; color: #93c5fd; }
+[data-theme="dark"] .array { background-color: #0c4a6e; color: #7dd3fc; }
+
+.copyPathBtn {
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  background-color: var(--bg-surface-alt);
+  border: 1px solid var(--border-light);
+  margin-left: auto;
+  transition: all var(--transition-fast);
+}
+
+.copyPathBtn:hover {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}

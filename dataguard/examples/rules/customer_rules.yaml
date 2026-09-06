@@ -1,0 +1,66 @@
+# DataGuard Quality Rules: Customer Dataset
+dataset: customers.csv
+version: "1.0"
+description: "Validation rules for customer onboarding and profile integrity"
+
+thresholds:
+  fail_on: high
+  min_quality_score: 85.0
+
+dataset_checks:
+  min_rows: 5
+  required_columns:
+    - customer_id
+    - name
+    - email
+    - age
+    - status
+
+columns:
+  customer_id:
+    type: integer
+    required: true
+    unique: true
+    min: 1
+    severity: critical
+    weight: 2.0
+    description: "Unique integer customer ID"
+
+  name:
+    type: string
+    required: true
+    severity: medium
+    weight: 1.0
+
+  email:
+    type: string
+    required: true
+    format: email
+    severity: high
+    weight: 1.5
+    description: "Valid standard email address"
+
+  age:
+    type: integer
+    min: 18
+    max: 120
+    severity: medium
+    weight: 1.0
+    description: "Age must be within 18 and 120"
+
+  status:
+    type: string
+    required: true
+    allowed:
+      - active
+      - inactive
+      - pending
+      - suspended
+    severity: high
+    weight: 1.2
+
+  signup_date:
+    type: date
+    required: false
+    severity: low
+    weight: 0.5

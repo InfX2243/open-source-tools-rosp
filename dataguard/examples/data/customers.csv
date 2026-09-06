@@ -1,0 +1,11 @@
+customer_id,name,email,age,status,signup_date,country
+1,Alice Smith,alice@example.com,28,active,2024-01-15,USA
+2,Bob Johnson,bob.j@example.org,34,active,2024-02-01,CAN
+3,Charlie Brown,charlie.b@test.co.uk,45,inactive,2023-11-20,GBR
+4,Diana Prince,diana@themyscira.net,29,active,2024-03-10,USA
+5,Evan Wright,evan.w@sample.com,52,pending,2024-04-05,AUS
+6,Fiona Gallagher,fiona@example.com,24,active,2024-01-22,USA
+7,George Clark,george.c@domain.org,61,suspended,2023-08-14,CAN
+8,Hannah Abbott,hannah@hogwarts.edu,19,active,2024-05-02,GBR
+9,Ian Malcolm,ian.chaos@jurassic.com,41,active,2023-12-01,USA
+10,Julia Roberts,julia@cinema.com,37,inactive,2024-02-18,FRA

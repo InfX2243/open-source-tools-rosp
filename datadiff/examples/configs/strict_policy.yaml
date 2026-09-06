@@ -1,0 +1,18 @@
+# DataDiff Strict CI/CD Quality Gate Configuration Example
+source:
+  path: "examples/data/customers_v1.csv"
+  format: "csv"
+
+target:
+  path: "examples/data/customers_v2.csv"
+  format: "csv"
+
+key:
+  - id
+
+policies:
+  allow_schema_changes: false
+  allow_column_removal: false
+  max_removed_rows: 0
+  max_modified_pct: 0.0
+  max_null_rate_increase: 0.0

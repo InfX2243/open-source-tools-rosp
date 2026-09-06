@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  dataguard-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dataguard-app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATAGUARD_DB_URL=postgresql://dataguard:dataguard_secret@postgres:5432/dataguard_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./examples:/app/examples
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: dataguard-postgres
+    environment:
+      - POSTGRES_USER=dataguard
+      - POSTGRES_PASSWORD=dataguard_secret
+      - POSTGRES_DB=dataguard_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dataguard -d dataguard_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:

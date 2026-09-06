@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dataguard"
+version = "0.1.0"
+description = "Lightweight, developer-friendly open-source data quality, validation and profiling platform"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "DataGuard Contributors", email = "maintainers@dataguard.dev"}
+]
+keywords = ["data-quality", "validation", "profiling", "data-engineering", "etl", "fastapi", "polars"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+    "pydantic>=2.0.0",
+    "pyyaml>=6.0",
+    "typer[all]>=0.9.0",
+    "rich>=13.0.0",
+    "polars>=0.20.0",
+    "sqlalchemy>=2.0.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.22.0",
+    "jinja2>=3.1.0",
+]
+
+[project.optional-dependencies]
+all = [
+    "pyarrow>=14.0.0",
+    "psycopg2-binary>=2.9.0",
+    "pymysql>=1.1.0",
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "httpx>=0.25.0",
+    "ruff>=0.1.0",
+    "black>=23.0.0",
+    "mypy>=1.6.0",
+]
+
+[project.scripts]
+dataguard = "dataguard.cli.commands:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["dataguard*", "api*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

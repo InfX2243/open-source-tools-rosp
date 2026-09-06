@@ -1,0 +1,5 @@
+id,name,email,age,balance,status,tier
+101,Rahul Sharma,rahul.sharma@newcorp.com,23,1500.005,active,gold
+102,Aisha Khan,aisha@example.com,24,3200.5,active,silver
+104,Elena Rostova,elena@example.com,29,10200.0,active,platinum
+105,Sara Chen,sara@example.com,25,2400.0,active,bronze

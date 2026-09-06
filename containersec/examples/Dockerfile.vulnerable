@@ -1,0 +1,25 @@
+FROM python:latest
+
+MAINTAINER security-test@example.com
+
+# Sensitive credentials leaked in image metadata
+ENV AWS_SECRET_ACCESS_KEY="AKIAIOSFODNN7EXAMPLE12345"
+ENV DB_PASSWORD="SuperSecretPassword123!"
+
+# Risky packages and curl piping
+RUN apt-get update && apt-get install -y openssh-server netcat curl
+RUN curl -sSL https://raw.githubusercontent.com/installer/install.sh | bash
+
+# Missing cache cleanup
+RUN pip install flask requests sqlalchemy
+
+# Insecure ADD usage
+ADD app.py /app/app.py
+ADD secrets/id_rsa /root/.ssh/id_rsa
+
+WORKDIR /app
+EXPOSE 22 80 8080 3306 5432 27017
+
+# Missing USER instruction: runs as root!
+# Missing HEALTHCHECK
+CMD ["python", "app.py"]

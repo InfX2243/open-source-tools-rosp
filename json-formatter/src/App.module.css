@@ -1,0 +1,44 @@
+.appShell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--bg-page);
+}
+
+.mainArea {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panesContainer {
+  display: flex;
+  gap: 1rem;
+  height: 100%;
+  width: 100%;
+}
+
+.pane {
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+}
+
+.code .pane, .tree .pane {
+  flex: 1;
+}
+
+@media (max-width: 900px) {
+  .panesContainer.split {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .panesContainer.split .pane {
+    min-height: 400px;
+  }
+}

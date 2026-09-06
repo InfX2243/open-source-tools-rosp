@@ -1,0 +1,5 @@
+[
+  {"order_id": "ORD-001", "customer_id": 101, "amount": 120.50, "status": "PENDING", "created_at": "2026-09-01"},
+  {"order_id": "ORD-002", "customer_id": 102, "amount": 45.00, "status": "COMPLETED", "created_at": "2026-09-01"},
+  {"order_id": "ORD-003", "customer_id": 103, "amount": 990.00, "status": "CANCELLED", "created_at": "2026-09-02"}
+]

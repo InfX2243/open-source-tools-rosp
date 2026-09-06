@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  datadiff:
+    build: .
+    container_name: datadiff-app
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./examples:/app/examples
+      - ./datadiff_history.db:/app/datadiff_history.db
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

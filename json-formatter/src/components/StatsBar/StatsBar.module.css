@@ -1,0 +1,51 @@
+.statsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 1.25rem;
+  background-color: var(--bg-header);
+  border-top: 1px solid var(--border-light);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.statsGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.statLabel {
+  font-weight: 500;
+}
+
+.statValue {
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-main);
+}
+
+.statDivider {
+  width: 1px;
+  height: 14px;
+  background-color: var(--border-light);
+}
+
+.footerBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.dot {
+  color: var(--text-muted);
+}

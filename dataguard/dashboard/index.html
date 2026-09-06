@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataGuard &bull; Open-Source Data Quality & Validation Platform</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <!-- Navigation Header -->
+  <nav class="navbar">
+    <a href="#" class="brand">
+      <div class="brand-icon-wrapper">
+        <i data-lucide="shield-check" style="width:22px; height:22px;"></i>
+      </div>
+      <span class="brand-text">DataGuard</span>
+      <span class="brand-badge">v0.1.0</span>
+    </a>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="scrollToSection('validator')">
+        <i data-lucide="play" style="width:16px; height:16px;"></i> Validation Studio
+      </button>
+      <button class="nav-btn" onclick="scrollToSection('guide')">
+        <i data-lucide="book-open" style="width:16px; height:16px;"></i> How to Use Guide
+      </button>
+      <button class="nav-btn" onclick="scrollToSection('history')">
+        <i data-lucide="history" style="width:16px; height:16px;"></i> Run History
+      </button>
+      <a href="/docs" target="_blank" class="nav-btn">
+        <i data-lucide="terminal" style="width:16px; height:16px;"></i> API Docs
+      </a>
+      <a href="https://github.com" target="_blank" class="btn-primary" style="padding:0.45rem 1rem; font-size:0.85rem; text-decoration:none;">
+        <i data-lucide="github" style="width:16px; height:16px;"></i> GitHub
+      </a>
+      <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Light / Dark Mode">
+        <i data-lucide="moon" id="themeIcon" style="width:18px; height:18px;"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+      <div class="hero-pill">
+        <i data-lucide="sparkles" style="width:14px; height:14px;"></i> Open-Source Data Quality Platform
+      </div>
+      <h1 class="hero-title">Developer-First Data Quality & Validation</h1>
+      <p class="hero-subtitle">
+        Define declarative rules in YAML, validate tabular files at Polars speed, calculate weighted quality scores, and catch data problems before production.
+      </p>
+
+      <!-- 1-Click Quick Samples -->
+      <div class="samples-bar">
+        <span class="samples-label">
+          <i data-lucide="zap" style="width:14px; height:14px; color:var(--accent-cyan);"></i> Quick Test Samples:
+        </span>
+        <button class="sample-chip" onclick="loadAndRunSample('customers')">
+          <i data-lucide="file-check-2" style="width:14px; height:14px; color:var(--success);"></i> Clean Customers (100% Pass)
+        </button>
+        <button class="sample-chip" onclick="loadAndRunSample('dirty_users')">
+          <i data-lucide="alert-triangle" style="width:14px; height:14px; color:var(--danger);"></i> Dirty Data (Catch Flaws)
+        </button>
+        <button class="sample-chip" onclick="loadAndRunSample('orders')">
+          <i data-lucide="file-json" style="width:14px; height:14px; color:var(--accent-purple);"></i> E-Commerce Orders (JSON)
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Validation Studio -->
+    <div id="validator" style="margin-bottom: 3.5rem;">
+      <div class="interactive-split">
+        <!-- Step 1: Select Data Source -->
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <h2 class="section-title">
+              <i data-lucide="upload-cloud" style="width:20px; height:20px; color:var(--accent-cyan);"></i> 1. Select Data Source
+            </h2>
+            <span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">CSV / JSON / Parquet</span>
+          </div>
+
+          <div id="dropzone" class="dropzone">
+            <div class="dropzone-icon">
+              <i data-lucide="file-up" style="width:24px; height:24px;"></i>
+            </div>
+            <div style="font-weight: 700; font-size:1.05rem; margin-bottom: 0.35rem;">Drop dataset file here</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">or click to browse local files</div>
+            <input type="file" id="fileInput" accept=".csv,.json,.jsonl,.parquet,.tsv" style="display:none;" />
+          </div>
+
+          <div id="selectedFileName" style="display:none; margin-top: 1rem; padding: 0.85rem 1rem; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; font-size: 0.9rem; align-items:center; gap:0.5rem;">
+            <i data-lucide="file-text" style="width:18px; height:18px; color:var(--accent-cyan);"></i>
+            <span id="selectedFileNameText"></span>
+          </div>
+        </div>
+
+        <!-- Step 2: Quality Rules (YAML) -->
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <h2 class="section-title">
+              <i data-lucide="code-2" style="width:20px; height:20px; color:var(--accent-purple);"></i> 2. Define Quality Rules (YAML)
+            </h2>
+            <div style="display: flex; gap: 0.35rem;">
+              <button class="btn-secondary" onclick="loadTemplate('customer')">Customer</button>
+              <button class="btn-secondary" onclick="loadTemplate('ecommerce')">E-Commerce</button>
+              <button class="btn-secondary" onclick="loadTemplate('basic')">Basic</button>
+            </div>
+          </div>
+
+          <textarea id="ruleEditor" class="code-editor" spellcheck="false"></textarea>
+
+          <div style="margin-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <span id="validationStatus" style="font-size: 0.85rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.4rem;"></span>
+            <button id="btnValidate" class="btn-primary" onclick="runLiveValidation()">
+              <i data-lucide="shield" style="width:18px; height:18px;"></i> Run Validation
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Results Container -->
+      <div id="resultsContainer" class="glass-card" style="display: none; margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight:700; letter-spacing:0.05em;">Validation Outcome</div>
+            <div style="font-size: 2rem; font-weight: 800; display: flex; align-items: center; gap: 1rem; margin-top:0.25rem;">
+              Quality Score: <span id="resScore">--%</span>
+              <span id="resGateBadge" class="badge">--</span>
+            </div>
+            <div id="resCounts" style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.35rem;"></div>
+          </div>
+          <button class="btn-secondary" onclick="scrollToSection('history')">
+            <i data-lucide="list-ordered" style="width:16px; height:16px;"></i> View Run History
+          </button>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.06); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 1.5rem;">
+          <div id="resScoreBar" style="height: 100%; width: 0%; transition: width 0.8s ease;"></div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 100px;">Status</th>
+                <th>Rule / Check</th>
+                <th>Column</th>
+                <th>Severity</th>
+                <th style="text-align: right;">Checked</th>
+                <th style="text-align: right;">Failed</th>
+                <th style="text-align: right;">Failure Rate</th>
+                <th>Details & Sample Violations</th>
+              </tr>
+            </thead>
+            <tbody id="resTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW TO USE GUIDE SECTION -->
+    <div id="guide" style="margin-bottom: 3.5rem;">
+      <div class="card-header-flex">
+        <div>
+          <h2 class="section-title">
+            <i data-lucide="compass" style="width:22px; height:22px; color:var(--accent-cyan);"></i> How to Use DataGuard
+          </h2>
+          <p style="font-size:0.9rem; color:var(--text-secondary); margin-top:0.25rem;">
+            A quick visual guide on how to configure quality rules, test datasets, and integrate quality gates into your pipelines.
+          </p>
+        </div>
+      </div>
+
+      <div class="guide-grid">
+        <!-- Step 1 -->
+        <div class="guide-step-card">
+          <span class="step-num">Step 1</span>
+          <div class="step-heading">
+            <i data-lucide="file-spreadsheet" style="width:18px; height:18px; color:var(--accent-cyan);"></i> Choose Your Dataset
+          </div>
+          <p class="step-desc">
+            Select or drag-and-drop any CSV, JSON, NDJSON, or Parquet file. DataGuard uses high-performance Polars multi-threading to read millions of rows in milliseconds.
+          </p>
+          <div class="step-code-preview">Supported: .csv, .tsv, .json, .parquet, SQLite/PostgreSQL</div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="guide-step-card">
+          <span class="step-num">Step 2</span>
+          <div class="step-heading">
+            <i data-lucide="sliders" style="width:18px; height:18px; color:var(--accent-blue);"></i> Write Declarative Rules
+          </div>
+          <p class="step-desc">
+            Define constraints in human-readable YAML: required non-nulls, data types, uniqueness, numeric ranges, standard formats (email/url), and whitelists.
+          </p>
+          <div class="step-code-preview">email: { type: string, required: true, format: email }</div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="guide-step-card">
+          <span class="step-num">Step 3</span>
+          <div class="step-heading">
+            <i data-lucide="check-circle-2" style="width:18px; height:18px; color:var(--success);"></i> Inspect Score & Flaws
+          </div>
+          <p class="step-desc">
+            DataGuard calculates a transparent 0–100% Quality Score and highlights the exact row numbers and offending values for every failed rule.
+          </p>
+          <div class="step-code-preview">Row #3: 'invalid-email' -> Failed pattern check</div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="guide-step-card">
+          <span class="step-num">Step 4</span>
+          <div class="step-heading">
+            <i data-lucide="git-merge" style="width:18px; height:18px; color:var(--accent-purple);"></i> Enforce CI/CD Gates
+          </div>
+          <p class="step-desc">
+            Add DataGuard to GitHub Actions with <code>--fail-on high</code>. If critical or high-severity rules fail, the command exits with code 1 to halt the build.
+          </p>
+          <div class="step-code-preview">dataguard validate data.csv --fail-on high</div>
+        </div>
+      </div>
+
+      <!-- Rule Syntax Reference Cheatsheet -->
+      <div class="cheatsheet-container">
+        <h3 style="font-size: 1.1rem; font-weight:700; margin-bottom: 1rem; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="book-marked" style="width:18px; height:18px; color:var(--accent-cyan);"></i> Rule Syntax Cheatsheet
+        </h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Check Type</th>
+                <th>YAML Property</th>
+                <th>Description</th>
+                <th>Example YAML</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Non-Null / Required</strong></td>
+                <td><code>required: true</code></td>
+                <td>Disallows null, None, or empty string values</td>
+                <td><code>email: { required: true }</code></td>
+              </tr>
+              <tr>
+                <td><strong>Data Type</strong></td>
+                <td><code>type: &lt;type&gt;</code></td>
+                <td>Conforms to integer, float, string, boolean, date, datetime</td>
+                <td><code>customer_id: { type: integer }</code></td>
+              </tr>
+              <tr>
+                <td><strong>Uniqueness</strong></td>
+                <td><code>unique: true</code></td>
+                <td>Ensures all checked column values are distinct</td>
+                <td><code>order_id: { unique: true }</code></td>
+              </tr>
+              <tr>
+                <td><strong>Value Bounds</strong></td>
+                <td><code>min</code>, <code>max</code>, <code>between</code></td>
+                <td>Enforces inclusive numerical or date boundaries</td>
+                <td><code>age: { between: [18, 120] }</code></td>
+              </tr>
+              <tr>
+                <td><strong>Standard Formats</strong></td>
+                <td><code>format: &lt;name&gt;</code></td>
+                <td>Built-in regex formats: <code>email</code>, <code>url</code>, <code>uuid</code>, <code>ipv4</code>, <code>phone</code></td>
+                <td><code>email: { format: email }</code></td>
+              </tr>
+              <tr>
+                <td><strong>Allowed Whitelist</strong></td>
+                <td><code>allowed: [val1, val2]</code></td>
+                <td>Limits values strictly to a predefined list</td>
+                <td><code>status: { allowed: [active, pending] }</code></td>
+              </tr>
+              <tr>
+                <td><strong>Custom Expression</strong></td>
+                <td><code>custom_expr: "..."</code></td>
+                <td>Evaluates safe Python expression on <code>val</code></td>
+                <td><code>code: { custom_expr: "val.startswith('CUST')" }</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Section -->
+    <div id="history" style="margin-top: 2rem;">
+      <div class="card-header-flex">
+        <h2 class="section-title">
+          <i data-lucide="history" style="width:20px; height:20px; color:var(--accent-cyan);"></i> Validation Run History
+        </h2>
+        <button class="btn-secondary" onclick="loadHistory()">
+          <i data-lucide="refresh-cw" style="width:14px; height:14px;"></i> Refresh History
+        </button>
+      </div>
+
+      <div class="glass-card" style="padding: 0; overflow: hidden;">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 70px;">Run ID</th>
+                <th>Dataset</th>
+                <th>Quality Score</th>
+                <th>Gate Status</th>
+                <th>Dataset Scale & Speed</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <div class="brand-icon-wrapper" style="width:28px; height:28px;">
+        <i data-lucide="shield-check" style="width:16px; height:16px;"></i>
+      </div>
+      <span>DataGuard Open-Source Project &bull; Released under Apache-2.0 License</span>
+    </div>
+    <div style="color:var(--text-muted); font-size:0.8rem;">
+      Powered by Polars, Pydantic v2, Typer & FastAPI
+    </div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+  <script>
+    function scrollToSection(id) {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

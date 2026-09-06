@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ContainerSec — Container & Dockerfile Security Linter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-subtle: #f1f5f9;
+      --border: #e2e8f0;
+      --border-focus: #3b82f6;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-subtle: #eff6ff;
+      --primary-border: #bfdbfe;
+
+      --critical: #dc2626;
+      --critical-bg: #fef2f2;
+      --critical-border: #fecaca;
+      
+      --high: #ea580c;
+      --high-bg: #fff7ed;
+      --high-border: #fed7aa;
+
+      --medium: #d97706;
+      --medium-bg: #fffbeb;
+      --medium-border: #fde68a;
+
+      --low: #2563eb;
+      --low-bg: #eff6ff;
+      --low-border: #bfdbfe;
+
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 60px;
+    }
+
+    /* Top Navigation Bar */
+    .navbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .navbar-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+    .brand-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-left: 6px;
+      letter-spacing: 0.04em;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      background: transparent;
+      transition: all 0.15s ease;
+    }
+    .nav-btn:hover {
+      color: var(--text-main);
+      background: var(--surface-subtle);
+    }
+    .nav-btn.active {
+      color: var(--primary);
+      background: var(--primary-subtle);
+      border-color: var(--primary-border);
+    }
+
+    /* Layout Container */
+    .main-container {
+      max-width: 1280px;
+      margin: 28px auto 0;
+      padding: 0 24px;
+    }
+
+    /* Section Tabs */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Scan View Grid */
+    .scan-layout {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .scan-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Cards */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafbfc;
+    }
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .panel-body { padding: 20px; }
+
+    /* Editor Area */
+    .editor-wrapper {
+      position: relative;
+    }
+    textarea.code-editor {
+      width: 100%;
+      height: 380px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: #1e293b;
+      background: #fdfdfd;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    textarea.code-editor:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Sample Selector & Action Row */
+    .action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover {
+      background: var(--surface-subtle);
+      border-color: #cbd5e1;
+    }
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+    .btn-success:hover { background: #15803d; }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12.5px;
+    }
+
+    /* Score and Stats Cards */
+    .summary-card {
+      padding: 20px;
+      background: #fafbfc;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .score-badge-large {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .score-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 3px solid var(--success);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      box-shadow: var(--shadow-sm);
+    }
+    .score-circle .points { font-size: 20px; line-height: 1; }
+    .score-circle .label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; }
+
+    .stats-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .stat-pill {
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .stat-pill.critical { background: var(--critical-bg); border-color: var(--critical-border); color: var(--critical); }
+    .stat-pill.high { background: var(--high-bg); border-color: var(--high-border); color: var(--high); }
+    .stat-pill.medium { background: var(--medium-bg); border-color: var(--medium-border); color: var(--medium); }
+    .stat-pill.low { background: var(--low-bg); border-color: var(--low-border); color: var(--low); }
+    .stat-pill.passed { background: var(--success-bg); border-color: var(--success-border); color: var(--success); }
+
+    /* Findings List */
+    .findings-container {
+      max-height: 520px;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .finding-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      padding: 14px 16px;
+      border-left: 4px solid #94a3b8;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      transition: transform 0.1s ease;
+    }
+    .finding-card.critical { border-left-color: var(--critical); }
+    .finding-card.high { border-left-color: var(--high); }
+    .finding-card.medium { border-left-color: var(--medium); }
+    .finding-card.low { border-left-color: var(--low); }
+
+    .finding-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .badge-critical { background: var(--critical-bg); color: var(--critical); }
+    .badge-high { background: var(--high-bg); color: var(--high); }
+    .badge-medium { background: var(--medium-bg); color: var(--medium); }
+    .badge-low { background: var(--low-bg); color: var(--low); }
+
+    .finding-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .finding-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .code-box {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 6px 10px;
+      margin-top: 8px;
+      color: #334155;
+    }
+    .fix-banner {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      color: #15803d;
+      font-size: 12.5px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    /* Policy Gate Banner */
+    .gate-banner {
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+    .gate-passed {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      color: var(--success);
+    }
+    .gate-failed {
+      background: var(--critical-bg);
+      border: 1px solid var(--critical-border);
+      color: var(--critical);
+    }
+
+    /* How to Use / Documentation */
+    .guide-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+    }
+    .guide-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .guide-subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 28px;
+    }
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .guide-card {
+      background: #fafbfc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+    .guide-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text-main);
+    }
+    .guide-card p {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .code-block {
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    /* Rules Explorer Table */
+    .rules-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin-top: 14px;
+    }
+    .rules-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .rules-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state i {
+      width: 48px;
+      height: 48px;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="#" class="brand">
+        <div class="brand-icon">
+          <i data-lucide="shield-check" style="width: 24px; height: 24px;"></i>
+        </div>
+        <div>
+          <span class="brand-title">ContainerSec</span>
+          <span class="brand-tag">v1.0</span>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <button class="nav-btn active" id="tab-btn-scanner" onclick="switchTab('scanner')">
+          <i data-lucide="scan" style="width: 16px; height: 16px;"></i>
+          Scanner & Fixer
+        </button>
+        <button class="nav-btn" id="tab-btn-rules" onclick="switchTab('rules')">
+          <i data-lucide="list-checks" style="width: 16px; height: 16px;"></i>
+          Rule Explorer
+        </button>
+        <button class="nav-btn" id="tab-btn-guide" onclick="switchTab('guide')">
+          <i data-lucide="book-open" style="width: 16px; height: 16px;"></i>
+          How To Use
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <!-- TAB 1: SCANNER & FIXER -->
+    <section id="tab-scanner" class="tab-content active">
+      
+      <!-- Quality Gate Status Banner -->
+      <div id="gate-banner-container"></div>
+
+      <div class="scan-layout">
+        
+        <!-- Left: Dockerfile Editor -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="file-code" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Dockerfile Source
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <select id="sample-picker" onchange="loadSample(this.value)" style="padding: 5px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 13px; font-family: var(--font-sans); outline: none; background: white;">
+                <option value="vulnerable">Sample: Vulnerable Dockerfile (CIS Violations)</option>
+                <option value="hardened">Sample: Hardened Production Dockerfile</option>
+              </select>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="editor-wrapper">
+              <textarea id="dockerfile-input" class="code-editor" spellcheck="false" placeholder="Paste or type Dockerfile contents here..."></textarea>
+            </div>
+            <div class="action-bar">
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-primary" onclick="runScan()">
+                  <i data-lucide="shield-alert" style="width: 16px; height: 16px;"></i>
+                  Run Security Scan
+                </button>
+                <button class="btn btn-success" onclick="runAutoFix()">
+                  <i data-lucide="wrench" style="width: 16px; height: 16px;"></i>
+                  Auto-Fix Violations
+                </button>
+              </div>
+              <div>
+                <label class="btn btn-secondary btn-sm" style="cursor: pointer;">
+                  <i data-lucide="upload" style="width: 14px; height: 14px;"></i>
+                  Upload File
+                  <input type="file" id="file-upload" onchange="handleFileUpload(event)" style="display: none;" />
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Scan Results & Score Card -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="activity" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Scan Results & Posture
+            </div>
+            <div id="scan-time-badge" style="font-size: 12px; color: var(--text-dim);">Ready</div>
+          </div>
+
+          <!-- Score Card -->
+          <div class="summary-card" id="summary-card">
+            <div class="score-badge-large">
+              <div class="score-circle" id="score-circle">
+                <span class="points" id="score-points">--</span>
+                <span class="label">SCORE</span>
+              </div>
+              <div>
+                <div style="font-size: 16px; font-weight: 800; color: var(--text-main);" id="score-grade-text">Grade: --</div>
+                <div style="font-size: 12.5px; color: var(--text-muted);" id="score-subtitle">Scan to evaluate posture</div>
+              </div>
+            </div>
+            <div class="stats-pills" id="stats-pills">
+              <div class="stat-pill critical"><i data-lucide="alert-octagon" style="width: 13px; height: 13px;"></i> <span id="count-critical">0</span> Critical</div>
+              <div class="stat-pill high"><i data-lucide="alert-triangle" style="width: 13px; height: 13px;"></i> <span id="count-high">0</span> High</div>
+              <div class="stat-pill medium"><i data-lucide="alert-circle" style="width: 13px; height: 13px;"></i> <span id="count-medium">0</span> Medium</div>
+              <div class="stat-pill passed"><i data-lucide="check" style="width: 13px; height: 13px;"></i> <span id="count-passed">0</span> Passed</div>
+            </div>
+          </div>
+
+          <!-- Findings List -->
+          <div class="findings-container" id="findings-list">
+            <div class="empty-state">
+              <i data-lucide="shield" style="display: block; margin: 0 auto 12px;"></i>
+              <div style="font-weight: 600;">No scan run yet</div>
+              <div style="font-size: 13px;">Click "Run Security Scan" to audit your Dockerfile.</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: RULE EXPLORER -->
+    <section id="tab-rules" class="tab-content">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <i data-lucide="book-marked" style="width: 18px; height: 18px; color: var(--primary);"></i>
+            Security Rules & CIS Docker Benchmark Catalog
+          </div>
+          <div id="rules-count-badge" style="font-size: 12.5px; color: var(--text-muted);">Loading rules...</div>
+        </div>
+        <div class="panel-body" style="padding: 0;">
+          <table class="rules-table">
+            <thead>
+              <tr>
+                <th style="width: 130px;">Rule ID</th>
+                <th style="width: 100px;">Severity</th>
+                <th style="width: 140px;">Category</th>
+                <th style="width: 140px;">CIS Reference</th>
+                <th>Title & Remediation</th>
+              </tr>
+            </thead>
+            <tbody id="rules-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: HOW TO USE GUIDE -->
+    <section id="tab-guide" class="tab-content">
+      <div class="guide-section">
+        <div class="guide-title">
+          <i data-lucide="compass" style="width: 28px; height: 28px; color: var(--primary);"></i>
+          How to Use ContainerSec
+        </div>
+        <div class="guide-subtitle">
+          A comprehensive guide to auditing, hardening, and automating container security in your development and CI/CD pipelines.
+        </div>
+
+        <div class="guide-grid">
+          <!-- Card 1 -->
+          <div class="guide-card">
+            <div class="guide-card-header">
+              <i data-lucide="terminal" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              1. CLI Quickstart
+            </div>
+            <p>ContainerSec works out of the box as a fast terminal tool. Run scans, export in JSON, SARIF, or HTML format, and automate gates.</p>
+            <div class="code-block"># Scan default Dockerfile
+python -m containersec scan
+
+# Scan with SARIF output for GitHub Actions
+python -m containersec scan --format sarif -o report.sarif
+
+# Auto-remediate common issues
+python -m containersec fix --write</div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="guide-card">
+            <div class="guide-card-header">
+              <i data-lucide="shield-check" style="width: 18px; height: 18px; color: var(--success);"></i>
+              2. CIS Docker Benchmark
+            </div>
+            <p>Enforces industry-standard Center for Internet Security (CIS) rules including non-root execution (CIS 4.1), pinned immutable tags, SSH removal, and cache pruning.</p>
+            <div class="code-block"># View all built-in rules & CIS mapping
+python -m containersec rules</div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="guide-card">
+            <div class="guide-card-header">
+              <i data-lucide="git-pull-request" style="width: 18px; height: 18px; color: #8b5cf6;"></i>
+              3. CI/CD Quality Gate
+            </div>
+            <p>Fail pull requests when developers introduce hardcoded secrets or critical vulnerabilities into your container images.</p>
+            <div class="code-block"># In your GitHub Actions workflow
+- name: Security Scan Dockerfile
+  run: |
+    python -m containersec scan --fail-on HIGH</div>
+          </div>
+        </div>
+
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Automated GitHub Actions Integration Example</h3>
+        <div class="code-block">name: Container Security Gate
+on: [push, pull_request]
+
+jobs:
+  containersec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install ContainerSec
+        run: pip install .
+      - name: Scan Dockerfile
+        run: containersec scan --fail-on HIGH --format sarif -o containersec.sarif
+      - name: Upload SARIF to GitHub Security Tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: containersec.sarif</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const SAMPLE_VULNERABLE = `FROM python:latest
+
+# Deprecated instruction
+MAINTAINER devops@example.com
+
+# Leaked credentials & secrets
+ENV AWS_SECRET_ACCESS_KEY="AKIAIOSFODNN7EXAMPLE12345"
+ENV DATABASE_PASSWORD="SuperSecretPassword123!"
+
+# Insecure package additions & remote curl piping
+RUN apt-get update && apt-get install -y openssh-server netcat curl
+RUN curl -sSL https://raw.githubusercontent.com/installer/install.sh | bash
+
+# Missing cache cleanup
+RUN pip install flask requests sqlalchemy
+
+# Insecure ADD usage
+ADD app.py /app/app.py
+ADD secrets/id_rsa /root/.ssh/id_rsa
+
+WORKDIR /app
+EXPOSE 22 80 8080 3306 5432 27017
+
+# Missing USER switch: running as root!
+# Missing HEALTHCHECK instruction
+CMD ["python", "app.py"]
+`;
+
+    const SAMPLE_HARDENED = `# Multi-stage secure build
+FROM python:3.11-slim-bookworm AS builder
+
+WORKDIR /build
+COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# Final minimal production stage
+FROM python:3.11-slim-bookworm
+
+LABEL maintainer="security@example.com"
+WORKDIR /app
+
+# Copy isolated dependencies
+COPY --from=builder /root/.local /home/appuser/.local
+COPY . /app
+
+# CIS-4.1: Principle of least privilege non-root user
+RUN groupadd -r appuser && useradd -r -g appuser -d /home/appuser -m appuser \\
+    && chown -R appuser:appuser /app /home/appuser
+
+USER appuser
+ENV PATH=/home/appuser/.local/bin:$PATH
+
+EXPOSE 8080
+
+# CIS-4.6: Healthcheck defined
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \\
+  CMD curl -f http://localhost:8080/health || exit 1
+
+CMD ["python", "app.py"]
+`;
+
+    // Initialize state
+    document.getElementById('dockerfile-input').value = SAMPLE_VULNERABLE;
+    lucide.createIcons();
+    fetchRules();
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById('tab-' + tabId).classList.add('active');
+      document.getElementById('tab-btn-' + tabId).classList.add('active');
+      lucide.createIcons();
+    }
+
+    function loadSample(type) {
+      const editor = document.getElementById('dockerfile-input');
+      editor.value = type === 'hardened' ? SAMPLE_HARDENED : SAMPLE_VULNERABLE;
+    }
+
+    async function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const text = await file.text();
+      document.getElementById('dockerfile-input').value = text;
+      runScan();
+    }
+
+    async function runScan() {
+      const content = document.getElementById('dockerfile-input').value;
+      if (!content.trim()) return alert("Please enter Dockerfile content");
+
+      try {
+        const res = await fetch('/api/scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dockerfile: content, target_name: "Dockerfile" }),
+        });
+        const data = await res.json();
+        renderResults(data.result, data.policy);
+      } catch (err) {
+        console.error(err);
+        alert("Scan failed: " + err.message);
+      }
+    }
+
+    async function runAutoFix() {
+      const content = document.getElementById('dockerfile-input').value;
+      if (!content.trim()) return alert("Please enter Dockerfile content");
+
+      try {
+        const res = await fetch('/api/fix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dockerfile: content }),
+        });
+        const data = await res.json();
+
+        // Update editor with fixed content
+        document.getElementById('dockerfile-input').value = data.fixed_dockerfile;
+        alert(`Fixed ${data.changes.length} issues! Score improved from ${data.original_score} to ${data.new_score}.`);
+        runScan();
+      } catch (err) {
+        console.error(err);
+        alert("Auto-fix failed: " + err.message);
+      }
+    }
+
+    function renderResults(result, policy) {
+      document.getElementById('scan-time-badge').innerText = `${result.execution_time_ms} ms`;
+      document.getElementById('score-points').innerText = result.score.points;
+      document.getElementById('score-grade-text').innerText = `Grade: ${result.score.grade}`;
+      document.getElementById('score-subtitle').innerText = `${result.findings.length} issues across ${result.total_instructions} instructions`;
+
+      // Color border based on score
+      const circle = document.getElementById('score-circle');
+      if (result.score.points >= 80) circle.style.borderColor = 'var(--success)';
+      else if (result.score.points >= 60) circle.style.borderColor = 'var(--medium)';
+      else circle.style.borderColor = 'var(--critical)';
+
+      // Stats counts
+      document.getElementById('count-critical').innerText = result.critical_count;
+      document.getElementById('count-high').innerText = result.high_count;
+      document.getElementById('count-medium').innerText = result.medium_count;
+      document.getElementById('count-passed').innerText = result.passed_rules.length;
+
+      // Gate Banner
+      const gateContainer = document.getElementById('gate-banner-container');
+      if (policy.passed) {
+        gateContainer.innerHTML = `
+          <div class="gate-banner gate-passed">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+              CI/CD Quality Gate: PASSED — Meets all security policy thresholds
+            </div>
+            <span style="font-size: 12px; font-weight: 500;">Zero Critical / Secrets Clean</span>
+          </div>
+        `;
+      } else {
+        const fails = policy.failures.join(" • ");
+        gateContainer.innerHTML = `
+          <div class="gate-banner gate-failed">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="shield-x" style="width: 18px; height: 18px;"></i>
+              CI/CD Quality Gate: FAILED — ${fails}
+            </div>
+            <span style="font-size: 12px; font-weight: 500;">Remediation Required</span>
+          </div>
+        `;
+      }
+
+      // Findings List
+      const list = document.getElementById('findings-list');
+      if (result.findings.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state" style="color: var(--success);">
+            <i data-lucide="check-circle-2" style="width: 48px; height: 48px; color: var(--success); display: block; margin: 0 auto 12px;"></i>
+            <div style="font-weight: 700; font-size: 16px;">Clean Dockerfile!</div>
+            <div style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">Zero security misconfigurations or CIS violations detected.</div>
+          </div>
+        `;
+      } else {
+        list.innerHTML = result.findings.map(f => {
+          const sevClass = f.severity.toLowerCase();
+          return `
+            <div class="finding-card ${sevClass}">
+              <div class="finding-top">
+                <span class="badge badge-${sevClass}">${f.severity}</span>
+                <span style="font-family: var(--font-mono); font-size: 12px; color: var(--primary); font-weight: 600;">${f.rule_id}</span>
+              </div>
+              <div class="finding-title">${escapeHtml(f.title)}</div>
+              <div class="finding-desc">${escapeHtml(f.description)}</div>
+              ${f.line_content ? `<div class="code-box">Line ${f.line_number}: ${escapeHtml(f.line_content.trim())}</div>` : ''}
+              ${f.fix_suggestion ? `
+                <div class="fix-banner">
+                  <i data-lucide="wrench" style="width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px;"></i>
+                  <span><strong>Fix:</strong> ${escapeHtml(f.fix_suggestion)}</span>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      lucide.createIcons();
+    }
+
+    async function fetchRules() {
+      try {
+        const res = await fetch('/api/rules');
+        const rules = await res.json();
+        document.getElementById('rules-count-badge').innerText = `${rules.length} active rules`;
+
+        const tbody = document.getElementById('rules-tbody');
+        tbody.innerHTML = rules.map(r => {
+          const sevClass = r.severity.toLowerCase();
+          return `
+            <tr>
+              <td><span style="font-family: var(--font-mono); font-weight: 600; color: var(--primary);">${r.rule_id}</span></td>
+              <td><span class="badge badge-${sevClass}">${r.severity}</span></td>
+              <td style="color: var(--text-muted); text-transform: capitalize;">${r.category}</td>
+              <td style="font-family: var(--font-mono); font-size: 12.5px; color: #475569;">${r.cis_benchmark || '-'}</td>
+              <td>
+                <div style="font-weight: 600; color: var(--text-main);">${escapeHtml(r.title)}</div>
+                <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 2px;">${escapeHtml(r.description)}</div>
+                ${r.fix_suggestion ? `<div style="font-size: 12px; color: #15803d; margin-top: 4px;"><strong>Remediation:</strong> ${escapeHtml(r.fix_suggestion)}</div>` : ''}
+              </td>
+            </tr>
+          `;
+        }).join('');
+        lucide.createIcons();
+      } catch (err) {
+        console.error("Failed to load rules", err);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Auto-run initial scan on load
+    setTimeout(runScan, 400);
+  </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+id,name,email,age,balance,status
+101,Rahul Sharma,rahul@example.com,22,1500.0,active
+102,Aisha Khan,aisha@example.com,24,3200.5,active
+103,John Doe,john@example.com,21,450.0,inactive
+104,Elena Rostova,elena@example.com,29,9800.0,active

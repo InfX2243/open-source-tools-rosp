@@ -1,0 +1,31 @@
+# Build Stage
+FROM python:3.11-slim-bookworm AS builder
+
+WORKDIR /build
+COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# Final Production Stage
+FROM python:3.11-slim-bookworm
+
+LABEL maintainer="devsecops@example.com"
+WORKDIR /app
+
+# Copy dependencies from builder
+COPY --from=builder /root/.local /home/appuser/.local
+COPY . /app
+
+# CIS-4.1: Non-root user
+RUN groupadd -r appuser && useradd -r -g appuser -d /home/appuser -m appuser \
+    && chown -R appuser:appuser /app /home/appuser
+
+USER appuser
+ENV PATH=/home/appuser/.local/bin:$PATH
+
+EXPOSE 8080
+
+# CIS-4.6: Healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1
+
+CMD ["python", "app.py"]

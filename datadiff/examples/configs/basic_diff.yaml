@@ -1,0 +1,22 @@
+# DataDiff Basic Configuration Example
+source:
+  path: "examples/data/customers_v1.csv"
+  format: "csv"
+
+target:
+  path: "examples/data/customers_v2.csv"
+  format: "csv"
+
+key:
+  - id
+
+rules:
+  numeric_tolerance: 0.01
+  case_sensitive: true
+  trim_whitespace: true
+
+policies:
+  allow_schema_changes: true
+  allow_column_removal: false
+  max_removed_rows: 5
+  max_modified_pct: 50.0

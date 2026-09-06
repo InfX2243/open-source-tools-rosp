@@ -1,0 +1,33 @@
+# DataGuard Quality Rules: Strict Quality Gate
+dataset: dirty_users.csv
+version: "1.0"
+description: "Strict quality gate designed to catch corrupt/dirty data and fail CI"
+
+thresholds:
+  fail_on: high
+  min_quality_score: 95.0
+
+columns:
+  customer_id:
+    type: integer
+    required: true
+    unique: true
+    severity: critical
+
+  email:
+    type: string
+    required: true
+    format: email
+    severity: high
+
+  age:
+    type: integer
+    min: 18
+    max: 120
+    severity: high
+
+  status:
+    type: string
+    required: true
+    allowed: [active, inactive, pending, suspended]
+    severity: high
