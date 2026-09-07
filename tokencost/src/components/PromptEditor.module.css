@@ -1,0 +1,226 @@
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  height: 100%;
+}
+
+.editorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  gap: 8px;
+}
+
+.tabGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tabBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tabBtn:hover {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.activeTab {
+  background-color: var(--bg-card);
+  color: var(--brand-primary);
+  border-color: var(--border-color);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.iconActionBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.iconActionBtn:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+}
+
+.iconActionBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.clearBtn:hover:not(:disabled) {
+  color: var(--accent-error);
+  border-color: var(--accent-error);
+}
+
+.textareaWrapper {
+  flex: 1;
+  display: flex;
+  min-height: 280px;
+  background-color: var(--bg-input);
+}
+
+.textarea {
+  flex: 1;
+  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  resize: none;
+  white-space: pre-wrap;
+}
+
+.textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.variablesSection {
+  padding: 10px 14px;
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.variablesHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.varIcon {
+  color: var(--brand-primary);
+}
+
+.variableGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.varChip {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.varLabel {
+  padding: 4px 8px;
+  background-color: var(--bg-tertiary);
+  font-family: var(--font-mono);
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: var(--brand-primary);
+  border-right: 1px solid var(--border-color);
+}
+
+.varInput {
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.775rem;
+  color: var(--text-primary);
+  min-width: 100px;
+}
+
+.editorFooter {
+  padding: 10px 14px;
+  background-color: var(--bg-tertiary);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tokenBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.tokenBadge strong {
+  font-family: var(--font-mono);
+  color: var(--brand-primary);
+}
+
+.dot {
+  color: var(--text-muted);
+}
+
+.outputSliderGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sliderLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.slider {
+  width: 100px;
+  cursor: pointer;
+}
+
+.sliderValue {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 32px;
+}

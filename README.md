@@ -22,7 +22,8 @@
   - [5. ✨ JSON Formatter & Visualizer — Web Utility & Tree Inspector](#5--json-formatter--visualizer--web-utility--tree-inspector)
   - [6. 🏗️ ScaffoldTree — Tree-to-Filesystem Scaffolding Generator](#6-️-scaffoldtree--tree-to-filesystem-scaffolding-generator)
   - [7. 🎨 SVG2JSX — SVG to React (JSX/TSX) & CSS Data-URI Converter](#7--svg2jsx--svg-to-react-jsxtsx--css-data-uri-converter)
-  - [8. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation](#8--treesnapshot--filesystem-to-tree-markdown-documentation)
+  - [8. 🪙 TokenCost — AI Prompt, Token Cost & Latency Playground](#8--tokencost--ai-prompt-token-cost--latency-playground)
+  - [9. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation](#9--treesnapshot--filesystem-to-tree-markdown-documentation)
 - [ScaffoldTree + TreeSnapshot Workflow](#-the-scaffoldtree--treesnapshot-duo)
 - [Repository Structure](#-repository-structure)
 - [Local Setup & Testing Guide](#-local-setup--testing-guide)
@@ -52,6 +53,7 @@ The **ROSP Open-Source Tools Suite** solves real-world pain points across modern
 | **[JSON Formatter](./json-formatter)** | Developer Utilities & Web | React 18, Vite, Lucide Icons | 100% client-side privacy-first JSON formatter, syntax repair engine, converter, and collapsible tree viewer. | [`/json-formatter`](./json-formatter) |
 | **[ScaffoldTree](./ScaffoldTree)** | Scaffolding & Project Setup | Python 3.8+ (Zero Deps) | Generates entire folder and file structures on disk directly from text/ASCII tree diagrams. | [`/ScaffoldTree`](./ScaffoldTree) |
 | **[SVG2JSX](./svg2jsx)** | Frontend & Asset Tooling | React 18, Vite, Prism.js | Transforms raw SVGs into React (JSX/TSX), React Native, CSS Data-URIs, and minified vector assets with live canvas studio. | [`/svg2jsx`](./svg2jsx) |
+| **[TokenCost](./tokencost)** | AI Engineering & LLM Tooling | React 18, Vite, Prism.js | Real-time token counter, multi-model cost benchmark (GPT-4o, Claude 3.5, Gemini, DeepSeek), variable templating & SDK exporter. | [`/tokencost`](./tokencost) |
 | **[TreeSnapshot](./TreeSnapshot)** | Documentation & Tooling | Python 3.8+ (Zero Deps) | Traverses any directory and captures an accurate, clean Markdown-friendly tree with `.treeignore` support. | [`/TreeSnapshot`](./TreeSnapshot) |
 
 ---
@@ -244,9 +246,29 @@ npm install
 npm run dev
 ```
 
+
+### 8. 🪙 TokenCost — AI Prompt, Token Cost & Latency Playground
+> *Accurately estimate token counts, calculate multi-model LLM API costs, template variables, and export SDK code.*
+
+#### 💡 Why It Is Useful
+Almost every modern software team builds with LLM APIs (OpenAI, Anthropic, Gemini, DeepSeek). Developers need to accurately measure token consumption across system and user prompts, estimate monthly API expenses across different request volumes, test dynamic prompt variables with sample data, and quickly generate boilerplate SDK integration code.
+
+#### 🚀 Key Capabilities
+- **Live Tokenizer & Prompt Studio**: Real-time token counter, character metrics, word counts, and max output tokens slider.
+- **Dynamic Variable Templating**: Detects `{{variable_name}}` placeholders with an interactive key-value test bench and resolved preview.
+- **Multi-Model Cost Matrix**: Compares 10+ models (GPT-4o, GPT-4o-mini, o3-mini, Claude 3.5 Sonnet, Claude 3.5 Haiku, Gemini 2.0 Flash, Gemini 1.5 Pro, DeepSeek V3/R1, Llama 3.3) across single, 1K, 10K, and 1M request volumes.
+- **1-Click SDK Boilerplate Exporter**: Generates code for OpenAI (Python/Node), Anthropic Claude (Python/TS), Google Gemini (Python/JS), LangChain, and cURL.
+
+#### ⚡ Quick Commands
+```bash
+cd tokencost
+npm install
+npm run dev
+```
+
 ---
 
-### 8. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation
+### 9. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation
 > *Captures clean, formatted ASCII directory trees from existing folders for documentation and READMEs.*
 
 #### 💡 Why It Is Useful
