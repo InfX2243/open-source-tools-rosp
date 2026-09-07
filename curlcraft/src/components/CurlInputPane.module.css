@@ -1,0 +1,205 @@
+.paneContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.paneHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.paneTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.titleIcon {
+  color: var(--brand-primary);
+}
+
+.parsedSummary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.methodBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badgeGet {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--badge-get);
+}
+
+.badgePost {
+  background: rgba(2, 132, 199, 0.15);
+  color: var(--badge-post);
+}
+
+.badgePut {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--badge-put);
+}
+
+.badgePatch {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--badge-patch);
+}
+
+.badgeDelete {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--badge-delete);
+}
+
+.badgeGeneric {
+  background: rgba(100, 116, 139, 0.15);
+  color: var(--badge-head);
+}
+
+.urlPreview {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.toolBtn:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+}
+
+.toolBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dangerBtn:hover:not(:disabled) {
+  color: var(--accent-error);
+  border-color: var(--accent-error);
+}
+
+.editorWrapper {
+  display: flex;
+  flex: 1;
+  min-height: 280px;
+  background-color: var(--bg-input);
+  position: relative;
+  overflow: hidden;
+}
+
+.lineNumbers {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 10px;
+  background-color: var(--bg-tertiary);
+  border-right: 1px solid var(--border-color);
+  user-select: none;
+  text-align: right;
+  min-width: 40px;
+}
+
+.lineNumber {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.textarea {
+  flex: 1;
+  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  resize: none;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+}
+
+.textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.paneFooter {
+  padding: 8px 16px;
+  background-color: var(--bg-tertiary);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.statusValid {
+  color: var(--accent-success);
+  font-weight: 500;
+}
+
+.statusHint {
+  color: var(--accent-warning);
+}
+
+.statusEmpty {
+  color: var(--text-muted);
+}

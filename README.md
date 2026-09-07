@@ -16,11 +16,12 @@
 - [Suite Tool Matrix](#-suite-tool-matrix)
 - [Detailed Tool Breakdown](#-detailed-tool-breakdown)
   - [1. 🛡️ ContainerSec — Container Security & CIS Linter](#1-️-containersec--container-security--cis-linter)
-  - [2. 🔍 DataDiff — Semantic Dataset & Schema Comparison](#2--datadiff--semantic-dataset--schema-comparison)
-  - [3. 🚀 DataGuard — Data Quality, Validation & Profiling](#3--dataguard--data-quality-validation--profiling)
-  - [4. ✨ JSON Formatter & Visualizer — Web Utility & Tree Inspector](#4--json-formatter--visualizer--web-utility--tree-inspector)
-  - [5. 🏗️ ScaffoldTree — Tree-to-Filesystem Scaffolding Generator](#5-️-scaffoldtree--tree-to-filesystem-scaffolding-generator)
-  - [6. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation](#6--treesnapshot--filesystem-to-tree-markdown-documentation)
+  - [2. ⚡ CurlCraft — cURL to Multi-Language Code Converter](#2-️-curlcraft--curl-to-multi-language-code-converter)
+  - [3. 🔍 DataDiff — Semantic Dataset & Schema Comparison](#3--datadiff--semantic-dataset--schema-comparison)
+  - [4. 🚀 DataGuard — Data Quality, Validation & Profiling](#4--dataguard--data-quality-validation--profiling)
+  - [5. ✨ JSON Formatter & Visualizer — Web Utility & Tree Inspector](#5--json-formatter--visualizer--web-utility--tree-inspector)
+  - [6. 🏗️ ScaffoldTree — Tree-to-Filesystem Scaffolding Generator](#6-️-scaffoldtree--tree-to-filesystem-scaffolding-generator)
+  - [7. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation](#7--treesnapshot--filesystem-to-tree-markdown-documentation)
 - [ScaffoldTree + TreeSnapshot Workflow](#-the-scaffoldtree--treesnapshot-duo)
 - [Repository Structure](#-repository-structure)
 - [Local Setup & Testing Guide](#-local-setup--testing-guide)
@@ -44,6 +45,7 @@ The **ROSP Open-Source Tools Suite** solves real-world pain points across modern
 | Tool | Primary Domain | Core Tech Stack | Primary Value & Use Case | Folder |
 | :--- | :--- | :--- | :--- | :--- |
 | **[ContainerSec](./containersec)** | Cloud & Container Security | Python, Rich, SARIF, Jinja2 | Audits Dockerfiles against CIS benchmarks, detects exposed secrets, and auto-remediates security flaws. | [`/containersec`](./containersec) |
+| **[CurlCraft](./curlcraft)** | Developer Utilities & API | React 18, Vite, Prism.js | Instantly transforms cURL commands into clean, copy-pasteable code for JavaScript (Fetch/Axios), Python, Go, Rust, and more. | [`/curlcraft`](./curlcraft) |
 | **[DataDiff](./datadiff)** | Data Engineering & ETL | Python, DuckDB / Polars, Rich | Semantic Git-diff for datasets; pinpoints row additions, removals, field modifications, schema migrations, and statistical drift. | [`/datadiff`](./datadiff) |
 | **[DataGuard](./dataguard)** | Data Quality & Governance | Python, Polars, FastAPI, HTML5 | Ultra-fast data profiling & rule validation with interactive HTML reports and REST API microservice. | [`/dataguard`](./dataguard) |
 | **[JSON Formatter](./json-formatter)** | Developer Utilities & Web | React 18, Vite, Lucide Icons | 100% client-side privacy-first JSON formatter, syntax repair engine, converter, and collapsible tree viewer. | [`/json-formatter`](./json-formatter) |
@@ -81,7 +83,41 @@ containersec fix Dockerfile --output Dockerfile.hardened
 
 ---
 
-### 2. 🔍 DataDiff — Semantic Dataset & Schema Comparison
+
+### 2. ⚡ CurlCraft — cURL to Multi-Language Code Converter
+> *Universal cURL command converter for Fetch, Axios, Python Requests, Go, Rust, and more.*
+
+#### 💡 Why It Is Useful
+Developers constantly copy raw cURL commands from browser DevTools, API documentation, or terminal sessions and need to translate them into clean, production-ready application code. CurlCraft provides 100% client-side, zero-telemetry conversion across 12+ targets with an interactive visual request inspector.
+
+#### 🚀 Key Capabilities
+- **Universal Multi-Target Code Generation**:
+  - **JavaScript**: Native `fetch` (with `async/await` & error handling)
+  - **JavaScript / TypeScript**: `Axios`
+  - **Node.js**: Native `fetch` / `Headers`
+  - **Python**: `requests` (idiomatic `json=`, `headers=`, `params=`, `auth=`)
+  - **Python (Async)**: `httpx` with `asyncio`
+  - **Go**: `net/http` with `http.Client`
+  - **Rust**: `reqwest` + Tokio
+  - **PHP**: `cURL` options
+  - **Java**: Modern `HttpClient`
+  - **C# / .NET**: `HttpClient`
+  - **Ruby**: `net/http`
+  - **CLI**: `HTTPie`
+- **Robust Multi-Line Parsing**: Handles line continuations (`\`, `` ` ``, `^`), Bearer tokens, Basic auth (`-u`), query parameters, JSON bodies, form URL encoded payloads, and multipart file uploads (`-F`).
+- **Interactive Request Inspector**: Visual key-value editor for headers and query parameters with real-time two-way synchronization.
+- **Embedded Mode**: Easily embedded via `iframe` in React platforms with `postMessage` support.
+
+#### ⚡ Quick Commands
+```bash
+cd curlcraft
+npm install
+npm run dev
+```
+
+---
+
+### 3. 🔍 DataDiff — Semantic Dataset & Schema Comparison
 > *Semantic Git-diff for tabular data, schemas, and statistical distributions.*
 
 #### 💡 Why It Is Useful
