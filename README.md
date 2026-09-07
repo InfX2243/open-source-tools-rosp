@@ -21,7 +21,8 @@
   - [4. 🚀 DataGuard — Data Quality, Validation & Profiling](#4--dataguard--data-quality-validation--profiling)
   - [5. ✨ JSON Formatter & Visualizer — Web Utility & Tree Inspector](#5--json-formatter--visualizer--web-utility--tree-inspector)
   - [6. 🏗️ ScaffoldTree — Tree-to-Filesystem Scaffolding Generator](#6-️-scaffoldtree--tree-to-filesystem-scaffolding-generator)
-  - [7. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation](#7--treesnapshot--filesystem-to-tree-markdown-documentation)
+  - [7. 🎨 SVG2JSX — SVG to React (JSX/TSX) & CSS Data-URI Converter](#7--svg2jsx--svg-to-react-jsxtsx--css-data-uri-converter)
+  - [8. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation](#8--treesnapshot--filesystem-to-tree-markdown-documentation)
 - [ScaffoldTree + TreeSnapshot Workflow](#-the-scaffoldtree--treesnapshot-duo)
 - [Repository Structure](#-repository-structure)
 - [Local Setup & Testing Guide](#-local-setup--testing-guide)
@@ -50,6 +51,7 @@ The **ROSP Open-Source Tools Suite** solves real-world pain points across modern
 | **[DataGuard](./dataguard)** | Data Quality & Governance | Python, Polars, FastAPI, HTML5 | Ultra-fast data profiling & rule validation with interactive HTML reports and REST API microservice. | [`/dataguard`](./dataguard) |
 | **[JSON Formatter](./json-formatter)** | Developer Utilities & Web | React 18, Vite, Lucide Icons | 100% client-side privacy-first JSON formatter, syntax repair engine, converter, and collapsible tree viewer. | [`/json-formatter`](./json-formatter) |
 | **[ScaffoldTree](./ScaffoldTree)** | Scaffolding & Project Setup | Python 3.8+ (Zero Deps) | Generates entire folder and file structures on disk directly from text/ASCII tree diagrams. | [`/ScaffoldTree`](./ScaffoldTree) |
+| **[SVG2JSX](./svg2jsx)** | Frontend & Asset Tooling | React 18, Vite, Prism.js | Transforms raw SVGs into React (JSX/TSX), React Native, CSS Data-URIs, and minified vector assets with live canvas studio. | [`/svg2jsx`](./svg2jsx) |
 | **[TreeSnapshot](./TreeSnapshot)** | Documentation & Tooling | Python 3.8+ (Zero Deps) | Traverses any directory and captures an accurate, clean Markdown-friendly tree with `.treeignore` support. | [`/TreeSnapshot`](./TreeSnapshot) |
 
 ---
@@ -216,9 +218,35 @@ cd ScaffoldTree
 python structure_generator.py examples/web_app_structure.txt ./my-new-project
 ```
 
+
+### 7. 🎨 SVG2JSX — SVG to React (JSX/TSX) & CSS Data-URI Converter
+> *Transform raw vector SVGs into clean React components, CSS background data-URIs, and minified vector assets.*
+
+#### 💡 Why It Is Useful
+Frontend developers constantly copy SVG icon code from Figma, Illustrator, or icon sets and need to manually clean attributes, convert kebab-case names, wire up size/color props, or format them for CSS backgrounds. SVG2JSX provides an all-in-one studio with a live canvas preview, color picker, dimensions slider, and 1-click code generators.
+
+#### 🚀 Key Capabilities
+- **Multi-Format Code Generators**:
+  - **React (JSX)**: Functional component with props (`size`, `color`, `className`, `...props`).
+  - **React (TSX)**: Fully typed component with `React.SVGProps<SVGSVGElement>` interface.
+  - **React Native SVG**: Uses `react-native-svg` imports (`Svg`, `Path`, `Circle`, etc.).
+  - **CSS Data-URI**: `background-image: url('data:image/svg+xml,...')` with optimized UTF-8 encoding.
+  - **CSS Mask**: `-webkit-mask-image` rules enabling dynamic icon colorization with `background-color`.
+  - **Cleaned & Minified SVG**: Strips doctype, XML headers, Figma/Illustrator/Inkscape metadata, and comments.
+  - **Base64 String & HTML `<img>` tag**.
+- **Interactive Live Preview Studio**: Adjustable sizes (16–128px), color override picker, transparent checkerboard background, flip & rotate controls.
+- **Component Customization**: Custom component name, `currentColor` conversion, `React.memo`, `React.forwardRef`, and named vs default exports.
+
+#### ⚡ Quick Commands
+```bash
+cd svg2jsx
+npm install
+npm run dev
+```
+
 ---
 
-### 6. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation
+### 8. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation
 > *Captures clean, formatted ASCII directory trees from existing folders for documentation and READMEs.*
 
 #### 💡 Why It Is Useful
