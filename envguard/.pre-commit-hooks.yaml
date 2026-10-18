@@ -1,0 +1,14 @@
+- id: envguard-check
+  name: EnvGuard Drift & Schema Check
+  description: Validates .env against .env.example or schema to prevent missing/mismatched environment variables.
+  entry: envguard check --strict
+  language: python
+  files: ^(\.env|\.env\.example|\.env\.schema\.yaml)$
+  pass_filenames: false
+
+- id: envguard-secrets
+  name: EnvGuard Secret Leak Scanner
+  description: Scans staged files for leaked API keys, tokens, and private credentials.
+  entry: envguard scan-secrets
+  language: python
+  pass_filenames: true

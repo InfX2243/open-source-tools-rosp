@@ -24,6 +24,7 @@
   - [7. 🎨 SVG2JSX — SVG to React (JSX/TSX) & CSS Data-URI Converter](#7--svg2jsx--svg-to-react-jsxtsx--css-data-uri-converter)
   - [8. 🪙 TokenCost — AI Prompt, Token Cost & Latency Playground](#8--tokencost--ai-prompt-token-cost--latency-playground)
   - [9. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation](#9--treesnapshot--filesystem-to-tree-markdown-documentation)
+  - [10. 🛡️ EnvGuard — Environment & Secret Governance](#10-️-envguard--environment--secret-governance)
 - [ScaffoldTree + TreeSnapshot Workflow](#-the-scaffoldtree--treesnapshot-duo)
 - [Repository Structure](#-repository-structure)
 - [Local Setup & Testing Guide](#-local-setup--testing-guide)
@@ -55,6 +56,7 @@ The **ROSP Open-Source Tools Suite** solves real-world pain points across modern
 | **[SVG2JSX](./svg2jsx)** | Frontend & Asset Tooling | React 18, Vite, Prism.js | Transforms raw SVGs into React (JSX/TSX), React Native, CSS Data-URIs, and minified vector assets with live canvas studio. | [`/svg2jsx`](./svg2jsx) |
 | **[TokenCost](./tokencost)** | AI Engineering & LLM Tooling | React 18, Vite, Prism.js | Real-time token counter, multi-model cost benchmark (GPT-4o, Claude 3.5, Gemini, DeepSeek), variable templating & SDK exporter. | [`/tokencost`](./tokencost) |
 | **[TreeSnapshot](./TreeSnapshot)** | Documentation & Tooling | Python 3.8+ (Zero Deps) | Traverses any directory and captures an accurate, clean Markdown-friendly tree with `.treeignore` support. | [`/TreeSnapshot`](./TreeSnapshot) |
+| **[EnvGuard](./envguard)** | Config, Secrets & Governance | Python, Rich, Typer, FastAPI | Validates .env schemas/drift, scans codebases to auto-generate .env.example, performs redacted diffing, catches secret leaks, and includes an interactive Web Dashboard (`envguard ui`). | [`/envguard`](./envguard) |
 
 ---
 
@@ -217,7 +219,7 @@ When starting a new project, setting up architecture, or following design docume
 cd ScaffoldTree
 
 # Generate project structure from tree definition file
-python structure_generator.py examples/web_app_structure.txt ./my-new-project
+python structure_generator.py examples/example.txt -o ./my-new-project
 ```
 
 
@@ -293,6 +295,40 @@ python tree_snapshot.py ./project --ignore "temp/*,*.log"
 
 ---
 
+### 10. 🛡️ EnvGuard — Environment & Secret Governance
+> *Developer-first CLI and engine for environment drift prevention, codebase scanning, redacted diffing, and secret hygiene.*
+
+#### 💡 Why It Is Useful
+Teams waste hours debugging broken local environments when new `.env` variables are merged without updating templates, and risk catastrophic data leaks when production API keys or tokens are inadvertently committed into `.env` or staging configs. EnvGuard eliminates drift and catches leaks before commits reach CI.
+
+#### 🚀 Key Capabilities
+- **Drift & Schema Validation**: Audits `.env` files against `.env.example` or declarative YAML schemas, flagging missing keys, undocumented extra keys, and semantic type mismatches (`port`, `boolean`, `url`, `email`, `integer`, `json`).
+- **Smart Codebase Scanner (`envguard generate`)**: Automatically inspects source code across Python, JavaScript/TypeScript, Go, PHP, Ruby, and Shell scripts to discover env lookups and generate a sanitized `.env.example` with dummy values.
+- **Safe Redacted Diff (`envguard diff`)**: Compares environment files (e.g. `staging.env` vs `prod.env`) without exposing secrets, displaying byte lengths, Shannon entropy, and masked previews.
+- **Pre-Commit Secret Scanner (`envguard scan-secrets`)**: Detects unmasked credentials (AWS, Stripe, OpenAI, GitHub tokens, private keys) with native pre-commit hook support.
+- **Interactive Web Dashboard (`envguard ui`)**: A modern glassmorphic dark-theme SPA served via FastAPI with tabs for Drift Audit, Redacted Diff, Codebase Generator, and Secret Scanner — all with one-click demo data presets.
+- **Multi-Format Reports**: Beautiful Rich terminal tables, machine-readable JSON (`--format json`), and standalone HTML dashboards (`--format html`).
+
+#### ⚡ Quick Command
+```bash
+cd envguard
+pip install -e .
+
+# Check for environment drift and type errors
+envguard check --strict
+
+# Generate sanitized .env.example by scanning project codebase
+envguard generate --output .env.example
+
+# Safely compare staging and production environments
+envguard diff staging.env prod.env
+
+# Launch the interactive Web Dashboard at http://127.0.0.1:8765
+envguard ui
+```
+
+---
+
 ## 🔄 The ScaffoldTree + TreeSnapshot Duo
 
 Together, **TreeSnapshot** and **ScaffoldTree** form a complete, bi-directional project templating and documentation loop:
@@ -329,6 +365,10 @@ open-source-tools-rosp/
 │   ├── examples/              # Sample vulnerable & hardened Dockerfiles
 │   └── pyproject.toml         # Package build & dependency metadata
 │
+├── curlcraft/                 # ⚡ cURL to Multi-Language Code Converter
+│   ├── src/                   # React generators, Monaco editor & UI
+│   └── package.json           # Dependencies & build scripts
+│
 ├── datadiff/                  # 🔍 Semantic Dataset Comparison Tool
 │   ├── datadiff/              # Comparison algorithms, schema diff & engines
 │   ├── tests/                 # Test suites for CSV, Parquet & JSON diffs
@@ -342,6 +382,13 @@ open-source-tools-rosp/
 │   ├── tests/                 # Unit tests & rule verification tests
 │   └── pyproject.toml         # Package build & dependency metadata
 │
+├── envguard/                  # 🛡️ Environment & Secret Governance Suite
+│   ├── envguard/              # Parser, checker, scanner, generator, differ, secrets, web
+│   ├── tests/                 # Unit, API & CLI test suites (26 tests)
+│   ├── examples/              # Sample .env, schemas, and test applications
+│   ├── .pre-commit-hooks.yaml # Git pre-commit hook definitions
+│   └── pyproject.toml         # Package build & dependency metadata
+│
 ├── json-formatter/            # ✨ React + Vite JSON Web Application
 │   ├── src/                   # React components (Tree, Editor, Converters)
 │   ├── public/                # Static web assets
@@ -352,6 +399,14 @@ open-source-tools-rosp/
 │   ├── structure_generator.py # Core scaffolding engine (zero dependencies)
 │   ├── examples/              # Sample tree definitions (.txt)
 │   └── README.md              # ScaffoldTree documentation
+│
+├── svg2jsx/                   # 🎨 SVG to React (JSX/TSX) & CSS Converter
+│   ├── src/                   # React canvas studio & transformation engine
+│   └── package.json           # Dependencies & build scripts
+│
+├── tokencost/                 # 🪙 AI Prompt, Token Cost & Latency Playground
+│   ├── src/                   # Tokenizer, model cost matrix & SDK exporter
+│   └── package.json           # Dependencies & build scripts
 │
 ├── TreeSnapshot/              # 📸 Filesystem-to-Tree Markdown Capture
 │   ├── tree_snapshot.py       # Core snapshot engine (zero dependencies)
@@ -370,7 +425,7 @@ open-source-tools-rosp/
 - **Python**: Version 3.8 or newer
 - **Node.js**: Version 18 or newer (with `npm`)
 
-### 1. Python Data & Security Tools (`containersec`, `datadiff`, `dataguard`)
+### 1. Python Data & Security Tools (`containersec`, `datadiff`, `dataguard`, `envguard`)
 
 ```bash
 # Create and activate a virtual environment
@@ -380,6 +435,9 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 # On Linux/macOS:
 source .venv/bin/activate
+
+# Test EnvGuard
+cd envguard && pip install -e . pytest && pytest && cd ..
 
 # Test ContainerSec
 cd containersec && pip install -e . pytest && pytest && cd ..
@@ -396,7 +454,7 @@ cd dataguard && pip install -e . pytest && pytest && cd ..
 ```bash
 # Test ScaffoldTree
 cd ScaffoldTree
-python structure_generator.py examples/web_app_structure.txt ./test-scaffold
+python structure_generator.py examples/example.txt -o ./test-scaffold
 cd ..
 
 # Test TreeSnapshot

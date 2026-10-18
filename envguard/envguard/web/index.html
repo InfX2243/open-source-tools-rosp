@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnvGuard — Environment & Secret Governance Dashboard</title>
+    <meta name="description" content="Open-source environment variable drift validation, secret leak prevention, safe redacted diffing, and codebase scanning dashboard.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --bg-body: #f8f9fb;
+            --bg-surface: #ffffff;
+            --bg-muted: #f1f3f8;
+            --bg-code: #f4f6fa;
+            --bg-hover: #eef1f6;
+            --border-main: #e2e5ec;
+            --border-subtle: #eef0f5;
+            --border-focus: #4f7df3;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
+            --text-inverse: #ffffff;
+            --accent-blue: #4f7df3;
+            --accent-blue-hover: #3b66d9;
+            --accent-blue-light: #eef2ff;
+            --accent-green: #059669;
+            --accent-green-light: #ecfdf5;
+            --accent-green-border: #a7f3d0;
+            --accent-amber: #d97706;
+            --accent-amber-light: #fffbeb;
+            --accent-amber-border: #fcd34d;
+            --accent-red: #dc2626;
+            --accent-red-light: #fef2f2;
+            --accent-red-border: #fca5a5;
+            --accent-violet: #7c3aed;
+            --accent-violet-light: #f5f3ff;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 30px -3px rgba(0,0,0,0.07), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ─── Header ─── */
+        header {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-main);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4f7df3 0%, #7c3aed 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .brand-logo i { width: 20px; height: 20px; }
+
+        .brand-name {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text-primary);
+        }
+
+        .brand-version {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 99px;
+            background: var(--accent-blue-light);
+            color: var(--accent-blue);
+            margin-left: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ─── Buttons ─── */
+        .btn {
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .btn i { width: 15px; height: 15px; }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: var(--text-inverse);
+            box-shadow: 0 1px 3px rgba(79,125,243,0.25);
+        }
+        .btn-primary:hover {
+            background: var(--accent-blue-hover);
+            box-shadow: 0 3px 10px rgba(79,125,243,0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            border-color: var(--border-main);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-muted);
+            color: var(--text-primary);
+        }
+
+        .btn-success-outline {
+            background: var(--accent-green-light);
+            color: var(--accent-green);
+            border-color: var(--accent-green-border);
+        }
+        .btn-success-outline:hover {
+            background: #d1fae5;
+        }
+
+        .btn-sm {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+
+        /* ─── Tab Navigation ─── */
+        .tab-nav {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-main);
+            padding: 0 32px;
+            display: flex;
+            gap: 2px;
+        }
+
+        .tab-trigger {
+            background: none;
+            border: none;
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            padding: 14px 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: all 0.15s ease;
+        }
+
+        .tab-trigger i { width: 16px; height: 16px; }
+
+        .tab-trigger:hover {
+            color: var(--text-secondary);
+            background: var(--bg-muted);
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+        }
+
+        .tab-trigger.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+
+        /* ─── Main Layout ─── */
+        main {
+            flex: 1;
+            padding: 28px 32px;
+            max-width: 1380px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tab-panel {
+            display: none;
+            animation: panelIn 0.2s ease;
+        }
+        .tab-panel.active { display: block; }
+
+        @keyframes panelIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Card ─── */
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-main);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .card-body { padding: 24px; }
+
+        .card-header-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .section-title i { width: 20px; height: 20px; color: var(--accent-blue); }
+
+        .section-desc {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+
+        /* ─── Editor Grid ─── */
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 900px) {
+            .editor-grid { grid-template-columns: 1fr; }
+        }
+
+        .editor-box {
+            border: 1px solid var(--border-main);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .editor-box:focus-within {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(79,125,243,0.1);
+        }
+
+        .editor-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 14px;
+            background: var(--bg-muted);
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .editor-label i { width: 14px; height: 14px; margin-right: 6px; color: var(--text-tertiary); }
+
+        .editor-label code {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            background: var(--bg-code);
+            padding: 1px 5px;
+            border-radius: 4px;
+            color: var(--accent-blue);
+        }
+
+        .code-area {
+            width: 100%;
+            height: 260px;
+            border: none;
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.65;
+            padding: 14px;
+            resize: vertical;
+            outline: none;
+        }
+
+        .code-area::placeholder { color: var(--text-tertiary); }
+
+        /* ─── Toolbar Bar ─── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 14px 18px;
+            background: var(--bg-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            margin-bottom: 22px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .check-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .check-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent-blue);
+            cursor: pointer;
+        }
+
+        /* ─── Stats Grid ─── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .stat-tile {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-main);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-tertiary);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        /* ─── Tables ─── */
+        .table-wrap {
+            border: 1px solid var(--border-main);
+            border-radius: var(--radius-md);
+            overflow-x: auto;
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        thead th {
+            text-align: left;
+            padding: 11px 16px;
+            background: var(--bg-muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-tertiary);
+            border-bottom: 1px solid var(--border-main);
+        }
+
+        tbody td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            vertical-align: middle;
+            color: var(--text-secondary);
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: var(--bg-hover); }
+
+        /* ─── Chips / Badges ─── */
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .chip i { width: 12px; height: 12px; }
+
+        .chip-critical { background: var(--accent-red-light); color: var(--accent-red); border: 1px solid var(--accent-red-border); }
+        .chip-high { background: var(--accent-amber-light); color: var(--accent-amber); border: 1px solid var(--accent-amber-border); }
+        .chip-success { background: var(--accent-green-light); color: var(--accent-green); border: 1px solid var(--accent-green-border); }
+        .chip-info { background: var(--accent-blue-light); color: var(--accent-blue); border: 1px solid #bfdbfe; }
+        .chip-violet { background: var(--accent-violet-light); color: var(--accent-violet); border: 1px solid #ddd6fe; }
+
+        .var-key {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--accent-blue);
+        }
+
+        .masked-preview {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .entropy-pill {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 4px;
+            background: var(--bg-muted);
+            color: var(--text-tertiary);
+        }
+
+        .entropy-pill.high {
+            background: var(--accent-violet-light);
+            color: var(--accent-violet);
+        }
+
+        /* ─── Status Banner ─── */
+        .banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+        }
+
+        .banner i { width: 20px; height: 20px; flex-shrink: 0; }
+
+        .banner-success {
+            background: var(--accent-green-light);
+            color: var(--accent-green);
+            border-color: var(--accent-green-border);
+        }
+
+        .banner-danger {
+            background: var(--accent-red-light);
+            color: var(--accent-red);
+            border-color: var(--accent-red-border);
+        }
+
+        .banner-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        /* ─── Select ─── */
+        .select-box {
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 7px 12px;
+            border: 1px solid var(--border-main);
+            border-radius: var(--radius-sm);
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            cursor: pointer;
+            outline: none;
+        }
+
+        .select-box:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(79,125,243,0.1);
+        }
+
+        /* ─── Empty State ─── */
+        .empty-row td {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+
+        /* ─── Footer ─── */
+        footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border-main);
+            padding: 18px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            background: var(--bg-surface);
+        }
+
+        footer a { color: var(--accent-blue); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ Header ═══ -->
+    <header>
+        <div class="brand">
+            <div class="brand-logo"><i data-lucide="shield-check"></i></div>
+            <span class="brand-name">EnvGuard</span>
+            <span class="brand-version">v1.0.0</span>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-success-outline" id="btn-demo" title="Populate all tabs with sample data">
+                <i data-lucide="zap"></i> Load Demo Data
+            </button>
+            <a href="https://github.com" target="_blank" class="btn btn-secondary">
+                <i data-lucide="github"></i> Repository
+            </a>
+        </div>
+    </header>
+
+    <!-- ═══ Tab Navigation ═══ -->
+    <nav class="tab-nav" role="tablist">
+        <button class="tab-trigger active" data-tab="audit">
+            <i data-lucide="shield-alert"></i> Drift &amp; Audit
+        </button>
+        <button class="tab-trigger" data-tab="diff">
+            <i data-lucide="git-compare"></i> Redacted Diff
+        </button>
+        <button class="tab-trigger" data-tab="gen">
+            <i data-lucide="file-cog"></i> Generator
+        </button>
+        <button class="tab-trigger" data-tab="secrets">
+            <i data-lucide="key-round"></i> Secret Scanner
+        </button>
+    </nav>
+
+    <!-- ═══ Main ═══ -->
+    <main>
+
+        <!-- ── Panel: Audit ── -->
+        <div class="tab-panel active" id="panel-audit">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-header-row">
+                        <div>
+                            <div class="section-title"><i data-lucide="shield-alert"></i> Environment Drift &amp; Schema Audit</div>
+                            <div class="section-desc">Compare your <code>.env</code> against <code>.env.example</code> or a YAML schema to detect missing keys, type errors, and exposed secrets.</div>
+                        </div>
+                    </div>
+
+                    <div class="editor-grid">
+                        <div class="editor-box">
+                            <div class="editor-label">
+                                <span><i data-lucide="file-text"></i>Target Environment <code>.env</code></span>
+                                <span id="lc-env">0 lines</span>
+                            </div>
+                            <textarea id="in-env" class="code-area" placeholder="Paste your .env contents here...&#10;PORT=8000&#10;DEBUG=true&#10;DATABASE_URL=postgresql://..."></textarea>
+                        </div>
+                        <div class="editor-box">
+                            <div class="editor-label">
+                                <span><i data-lucide="file-check"></i>Reference <code>.env.example</code></span>
+                                <span id="lc-ex">0 lines</span>
+                            </div>
+                            <textarea id="in-example" class="code-area" placeholder="Paste .env.example or YAML schema here...&#10;PORT=8000&#10;DEBUG=false"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="toolbar">
+                        <div class="toolbar-left">
+                            <label class="check-label">
+                                <input type="checkbox" id="chk-strict">
+                                Strict Mode (flag undocumented variables)
+                            </label>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-secondary" onclick="clearAudit()"><i data-lucide="eraser"></i> Clear</button>
+                            <button class="btn btn-primary" onclick="runAudit()"><i data-lucide="scan-search"></i> Run Audit</button>
+                        </div>
+                    </div>
+
+                    <div id="audit-out" style="display:none;">
+                        <div id="audit-banner" class="banner"></div>
+
+                        <div class="stats-row">
+                            <div class="stat-tile">
+                                <div class="stat-label">Checked</div>
+                                <div class="stat-value" id="s-total" style="color:var(--accent-blue)">0</div>
+                            </div>
+                            <div class="stat-tile">
+                                <div class="stat-label">Critical</div>
+                                <div class="stat-value" id="s-crit" style="color:var(--accent-red)">0</div>
+                            </div>
+                            <div class="stat-tile">
+                                <div class="stat-label">High</div>
+                                <div class="stat-value" id="s-high" style="color:var(--accent-amber)">0</div>
+                            </div>
+                            <div class="stat-tile">
+                                <div class="stat-label">Medium / Low</div>
+                                <div class="stat-value" id="s-low" style="color:var(--text-tertiary)">0</div>
+                            </div>
+                        </div>
+
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr>
+                                    <th style="width:100px">Severity</th>
+                                    <th style="width:150px">Type</th>
+                                    <th style="width:190px">Variable</th>
+                                    <th style="width:60px">Line</th>
+                                    <th>Description</th>
+                                </tr></thead>
+                                <tbody id="audit-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Panel: Diff ── -->
+        <div class="tab-panel" id="panel-diff">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-header-row">
+                        <div>
+                            <div class="section-title"><i data-lucide="git-compare"></i> Safe Redacted Environment Diff</div>
+                            <div class="section-desc">Compare two environment files with Shannon entropy analysis and value masking. Secrets are never displayed.</div>
+                        </div>
+                    </div>
+
+                    <div class="editor-grid">
+                        <div class="editor-box">
+                            <div class="editor-label">
+                                <span><i data-lucide="file-text"></i>Environment 1 <code>staging.env</code></span>
+                            </div>
+                            <textarea id="in-d1" class="code-area" placeholder="Paste first environment file..."></textarea>
+                        </div>
+                        <div class="editor-box">
+                            <div class="editor-label">
+                                <span><i data-lucide="file-text"></i>Environment 2 <code>prod.env</code></span>
+                            </div>
+                            <textarea id="in-d2" class="code-area" placeholder="Paste second environment file..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="toolbar">
+                        <div class="toolbar-left">
+                            <span style="font-size:13px;color:var(--text-tertiary)"><i data-lucide="lock" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px"></i>All comparisons are performed locally. No data leaves your machine.</span>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-primary" onclick="runDiff()"><i data-lucide="git-compare"></i> Compare</button>
+                        </div>
+                    </div>
+
+                    <div id="diff-out" style="display:none;">
+                        <div class="stats-row">
+                            <div class="stat-tile"><div class="stat-label">Total Keys</div><div class="stat-value" id="d-total" style="color:var(--accent-blue)">0</div></div>
+                            <div class="stat-tile"><div class="stat-label">Matched</div><div class="stat-value" id="d-match" style="color:var(--accent-green)">0</div></div>
+                            <div class="stat-tile"><div class="stat-label">Modified</div><div class="stat-value" id="d-mod" style="color:var(--accent-amber)">0</div></div>
+                            <div class="stat-tile"><div class="stat-label">Added / Removed</div><div class="stat-value" id="d-ar" style="color:var(--accent-red)">0</div></div>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr>
+                                    <th style="width:110px">Status</th>
+                                    <th style="width:200px">Variable</th>
+                                    <th>File 1 (Length &middot; Entropy &middot; Preview)</th>
+                                    <th>File 2 (Length &middot; Entropy &middot; Preview)</th>
+                                </tr></thead>
+                                <tbody id="diff-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Panel: Generator ── -->
+        <div class="tab-panel" id="panel-gen">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-header-row">
+                        <div>
+                            <div class="section-title"><i data-lucide="file-cog"></i> Smart .env.example Generator</div>
+                            <div class="section-desc">Paste source code to auto-discover environment variable lookups and generate a sanitized template with realistic defaults.</div>
+                        </div>
+                        <select id="gen-lang" class="select-box">
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript / TypeScript</option>
+                            <option value="go">Go</option>
+                        </select>
+                    </div>
+
+                    <div class="editor-grid">
+                        <div class="editor-box">
+                            <div class="editor-label">
+                                <span><i data-lucide="code-2"></i>Source Code Snippet</span>
+                            </div>
+                            <textarea id="in-code" class="code-area" placeholder="Paste code referencing env variables...&#10;port = os.getenv('PORT', 8000)&#10;db = os.environ['DATABASE_URL']"></textarea>
+                        </div>
+                        <div class="editor-box">
+                            <div class="editor-label">
+                                <span><i data-lucide="file-output"></i>Generated <code>.env.example</code></span>
+                                <button class="btn btn-secondary btn-sm" onclick="copyGen()"><i data-lucide="copy"></i> <span id="copy-label">Copy</span></button>
+                            </div>
+                            <textarea id="out-gen" class="code-area" readonly placeholder="Generated template will appear here..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="toolbar">
+                        <div class="toolbar-left">
+                            <span style="font-size:13px;color:var(--text-tertiary)">Supports os.environ, os.getenv, process.env, import.meta.env, os.Getenv, ENV[] patterns.</span>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-primary" onclick="runGen()"><i data-lucide="sparkles"></i> Scan &amp; Generate</button>
+                        </div>
+                    </div>
+
+                    <div id="gen-out" style="display:none;">
+                        <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                            <i data-lucide="list-checks" style="width:18px;height:18px;color:var(--accent-blue)"></i> Discovered Variables
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr>
+                                    <th>Variable</th>
+                                    <th>Occurrences</th>
+                                    <th>Language</th>
+                                    <th>Reference</th>
+                                </tr></thead>
+                                <tbody id="gen-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Panel: Secrets ── -->
+        <div class="tab-panel" id="panel-secrets">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-header-row">
+                        <div>
+                            <div class="section-title"><i data-lucide="key-round"></i> Credential &amp; Secret Leak Scanner</div>
+                            <div class="section-desc">Scan configuration files or code for unmasked live API keys, tokens, and private keys before they reach version control.</div>
+                        </div>
+                    </div>
+
+                    <div class="editor-box" style="margin-bottom:18px;">
+                        <div class="editor-label">
+                            <span><i data-lucide="search-code"></i>Input Payload</span>
+                        </div>
+                        <textarea id="in-sec" class="code-area" placeholder="Paste text to scan for exposed AWS, Stripe, GitHub, OpenAI keys, or Private Keys..."></textarea>
+                    </div>
+
+                    <div class="toolbar">
+                        <div class="toolbar-left">
+                            <span style="font-size:13px;color:var(--text-tertiary)">Matches high-precision signatures for AWS AKIA, GitHub PATs, Stripe live keys, OpenAI sk-*, Slack tokens, and PEM blocks.</span>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-primary" onclick="runSecrets()"><i data-lucide="shield-alert"></i> Scan for Leaks</button>
+                        </div>
+                    </div>
+
+                    <div id="sec-out" style="display:none;">
+                        <div id="sec-banner" class="banner"></div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr>
+                                    <th style="width:100px">Severity</th>
+                                    <th style="width:200px">Secret Type</th>
+                                    <th style="width:170px">Masked Preview</th>
+                                    <th style="width:70px">Line</th>
+                                    <th>Advisory</th>
+                                </tr></thead>
+                                <tbody id="sec-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ═══ Footer ═══ -->
+    <footer>
+        <span>EnvGuard &mdash; Open-Source Environment &amp; Secret Governance Suite</span>
+        <span>REST API at <code>/api</code> &middot; Part of the <a href="https://github.com">ROSP Tools Suite</a></span>
+    </footer>
+
+    <!-- ═══ JavaScript ═══ -->
+    <script>
+        // Init Lucide Icons
+        lucide.createIcons();
+
+        let _auditResult = null;
+
+        /* ── Tab Switching ── */
+        document.querySelectorAll('.tab-trigger').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        /* ── Load Demo ── */
+        document.getElementById('btn-demo').addEventListener('click', async () => {
+            try {
+                const r = await fetch('/api/sample-data');
+                const d = await r.json();
+                document.getElementById('in-env').value = d.env;
+                document.getElementById('in-example').value = d.example;
+                document.getElementById('in-d1').value = d.staging;
+                document.getElementById('in-d2').value = d.prod;
+                document.getElementById('in-code').value = d.code;
+                document.getElementById('in-sec').value = d.secrets;
+                runAudit();
+            } catch (e) { alert('Could not load sample data: ' + e.message); }
+        });
+
+        /* ── Audit ── */
+        function clearAudit() {
+            document.getElementById('in-env').value = '';
+            document.getElementById('in-example').value = '';
+            document.getElementById('audit-out').style.display = 'none';
+        }
+
+        async function runAudit() {
+            const env = document.getElementById('in-env').value;
+            if (!env.trim()) return alert('Enter .env content to audit.');
+            const res = await fetch('/api/check', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    env_content: env,
+                    example_content: document.getElementById('in-example').value,
+                    strict: document.getElementById('chk-strict').checked
+                })
+            });
+            const data = await res.json();
+            _auditResult = data;
+            renderAudit(data);
+        }
+
+        function renderAudit(r) {
+            document.getElementById('audit-out').style.display = 'block';
+            const ban = document.getElementById('audit-banner');
+            if (r.passed) {
+                ban.className = 'banner banner-success';
+                ban.innerHTML = '<i data-lucide="check-circle-2"></i><div class="banner-row"><span>Passed &mdash; Environment conforms to the reference specification</span><button class="btn btn-secondary btn-sm" onclick="downloadReport()"><i data-lucide="download"></i> Export JSON</button></div>';
+            } else {
+                ban.className = 'banner banner-danger';
+                ban.innerHTML = '<i data-lucide="alert-triangle"></i><div class="banner-row"><span>Failed &mdash; Environment drift or type violations detected</span><button class="btn btn-secondary btn-sm" onclick="downloadReport()"><i data-lucide="download"></i> Export JSON</button></div>';
+            }
+            lucide.createIcons({nameAttr: 'data-lucide'});
+
+            const crit = r.issues.filter(i=>i.severity==='CRITICAL').length;
+            const high = r.issues.filter(i=>i.severity==='HIGH').length;
+            const low = r.issues.filter(i=>['MEDIUM','LOW','INFO'].includes(i.severity)).length;
+            document.getElementById('s-total').textContent = r.total_checked;
+            document.getElementById('s-crit').textContent = crit;
+            document.getElementById('s-high').textContent = high;
+            document.getElementById('s-low').textContent = low;
+
+            const tb = document.getElementById('audit-tbody');
+            tb.innerHTML = '';
+            if (!r.issues.length) {
+                tb.innerHTML = '<tr class="empty-row"><td colspan="5"><i data-lucide="circle-check-big" style="width:20px;height:20px;vertical-align:-4px;margin-right:6px;color:var(--accent-green)"></i>Zero issues found. All variables are properly documented and typed.</td></tr>';
+                lucide.createIcons({nameAttr: 'data-lucide'});
+                return;
+            }
+            r.issues.forEach(i => {
+                const cls = i.severity==='CRITICAL'?'chip-critical':i.severity==='HIGH'?'chip-high':'chip-info';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td><span class="chip ${cls}">${i.severity}</span></td><td><code style="font-size:12px;color:var(--text-secondary)">${i.issue_type}</code></td><td><span class="var-key">${i.key}</span></td><td>${i.line_number||'-'}</td><td style="color:var(--text-secondary)">${i.message}</td>`;
+                tb.appendChild(tr);
+            });
+        }
+
+        function downloadReport() {
+            if (!_auditResult) return;
+            const blob = new Blob([JSON.stringify(_auditResult,null,2)],{type:'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'envguard_audit.json';
+            a.click();
+        }
+
+        /* ── Diff ── */
+        async function runDiff() {
+            const f1 = document.getElementById('in-d1').value;
+            const f2 = document.getElementById('in-d2').value;
+            if (!f1.trim() || !f2.trim()) return alert('Enter content for both environments.');
+            const res = await fetch('/api/diff', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({file1_content:f1, file2_content:f2, name1:'staging.env', name2:'prod.env'})
+            });
+            const d = await res.json();
+            renderDiff(d);
+        }
+
+        function renderDiff(d) {
+            document.getElementById('diff-out').style.display = 'block';
+            document.getElementById('d-total').textContent = d.total_keys;
+            document.getElementById('d-match').textContent = d.matched;
+            document.getElementById('d-mod').textContent = d.modified;
+            document.getElementById('d-ar').textContent = d.added + d.removed;
+            const tb = document.getElementById('diff-tbody');
+            tb.innerHTML = '';
+            d.fields.forEach(f => {
+                let chip = '';
+                if (f.diff_type==='MATCH') chip='<span class="chip chip-success">Match</span>';
+                else if (f.diff_type==='ADDED') chip='<span class="chip chip-success">+ Added</span>';
+                else if (f.diff_type==='REMOVED') chip='<span class="chip chip-critical">- Removed</span>';
+                else chip='<span class="chip chip-high">Modified</span>';
+
+                const ec1 = f.file1_entropy > 3.2 ? 'entropy-pill high' : 'entropy-pill';
+                const ec2 = f.file2_entropy > 3.2 ? 'entropy-pill high' : 'entropy-pill';
+
+                const c1 = f.file1_present
+                    ? `${f.file1_len}b &middot; <span class="${ec1}">ent:${f.file1_entropy}</span> &middot; <span class="masked-preview">${f.masked_preview1||'-'}</span>`
+                    : '<span style="color:var(--text-tertiary)">&lt;absent&gt;</span>';
+                const c2 = f.file2_present
+                    ? `${f.file2_len}b &middot; <span class="${ec2}">ent:${f.file2_entropy}</span> &middot; <span class="masked-preview">${f.masked_preview2||'-'}</span>`
+                    : '<span style="color:var(--text-tertiary)">&lt;absent&gt;</span>';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${chip}</td><td><span class="var-key">${f.key}</span></td><td>${c1}</td><td>${c2}</td>`;
+                tb.appendChild(tr);
+            });
+        }
+
+        /* ── Generator ── */
+        async function runGen() {
+            const code = document.getElementById('in-code').value;
+            if (!code.trim()) return alert('Enter code to scan.');
+            const res = await fetch('/api/generate', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({code_content:code, code_language:document.getElementById('gen-lang').value})
+            });
+            const d = await res.json();
+            document.getElementById('out-gen').value = d.generated_example;
+            const wrap = document.getElementById('gen-out');
+            const tb = document.getElementById('gen-tbody');
+            tb.innerHTML = '';
+            if (d.discovered_variables && d.discovered_variables.length) {
+                wrap.style.display = 'block';
+                d.discovered_variables.forEach(v => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td><span class="var-key">${v.key}</span></td><td>${v.occurrences}</td><td><span class="chip chip-info">${v.language}</span></td><td><code style="font-size:12px">${v.file}:${v.line}</code></td>`;
+                    tb.appendChild(tr);
+                });
+                lucide.createIcons({nameAttr: 'data-lucide'});
+            }
+        }
+
+        function copyGen() {
+            const t = document.getElementById('out-gen').value;
+            if (!t) return;
+            navigator.clipboard.writeText(t);
+            const el = document.getElementById('copy-label');
+            el.textContent = 'Copied!';
+            setTimeout(() => el.textContent = 'Copy', 1800);
+        }
+
+        /* ── Secrets ── */
+        async function runSecrets() {
+            const text = document.getElementById('in-sec').value;
+            if (!text.trim()) return alert('Enter text to scan.');
+            const res = await fetch('/api/scan-secrets', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({text_content:text})
+            });
+            const d = await res.json();
+            renderSecrets(d);
+        }
+
+        function renderSecrets(d) {
+            document.getElementById('sec-out').style.display = 'block';
+            const ban = document.getElementById('sec-banner');
+            const tb = document.getElementById('sec-tbody');
+            tb.innerHTML = '';
+            if (!d.count) {
+                ban.className = 'banner banner-success';
+                ban.innerHTML = '<i data-lucide="check-circle-2"></i> No live credentials or sensitive tokens detected. Clean!';
+                lucide.createIcons({nameAttr: 'data-lucide'});
+                return;
+            }
+            ban.className = 'banner banner-danger';
+            ban.innerHTML = '<i data-lucide="alert-triangle"></i> Detected <strong>' + d.count + '</strong> unmasked secret(s). Redact before committing.';
+            lucide.createIcons({nameAttr: 'data-lucide'});
+            d.findings.forEach(f => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td><span class="chip chip-critical">${f.severity}</span></td><td style="font-weight:600;color:var(--accent-red)">${f.secret_type}</td><td><span class="masked-preview">${f.masked_preview}</span></td><td>Line ${f.line_number}</td><td style="color:var(--text-secondary)">${f.description}</td>`;
+                tb.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>

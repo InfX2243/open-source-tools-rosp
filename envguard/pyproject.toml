@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "envguard"
+version = "1.0.0"
+description = "Environment & Secret Governance — Schema Validation, Codebase Scanning, Redacted Diffing, and Leak Prevention"
+readme = "README.md"
+authors = [{ name = "ROSP Community" }]
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = [
+    "pydantic>=2.0.0",
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "pyyaml>=6.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.22.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.scripts]
+envguard = "envguard.cli.commands:app"
+
+[tool.setuptools.packages.find]
+include = ["envguard*"]
