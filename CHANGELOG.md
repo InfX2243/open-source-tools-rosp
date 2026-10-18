@@ -7,7 +7,7 @@
 
 ## 🏷️ [v1.0.0] — 2026-10-18
 
-> 📦 **Release:** `v1.0.0` &nbsp;•&nbsp; 📅 **Date:** `2026-10-18` &nbsp;•&nbsp; 🔨 **Commits:** `13` &nbsp;•&nbsp; 👥 **Contributors:** `3`
+> 📦 **Release:** `v1.0.0` &nbsp;•&nbsp; 📅 **Date:** `2026-10-18` &nbsp;•&nbsp; 🔨 **Commits:** `15` &nbsp;•&nbsp; 👥 **Contributors:** `3`
 
 ### 🚀 New Features & Tools
 
@@ -28,6 +28,12 @@
 | :--- | :--- | :---: | :--- |
 | `ScaffoldTree` | Fix directory nesting problem | [`bc40e97`](https://github.com/InfX2243/open-source-tools-rosp/commit/bc40e97) | [@InfX2243](https://github.com/InfX2243) |
 
+### 📚 Documentation
+
+| Component | Description | Commit | Author |
+| :--- | :--- | :---: | :--- |
+| `changelog` | Auto-update CHANGELOG.md [skip ci] | [`ff62581`](https://github.com/InfX2243/open-source-tools-rosp/commit/ff62581) | [@Zainab-013](https://github.com/Zainab-013) |
+
 ### 🔧 Maintenance & Configuration
 
 | Component | Description | Commit | Author |
@@ -38,6 +44,7 @@
 
 | Component | Description | Commit | Author |
 | :--- | :--- | :---: | :--- |
+| *core* | Repohealth tool done | [`d2954ed`](https://github.com/InfX2243/open-source-tools-rosp/commit/d2954ed) | [@Zainab-013](https://github.com/Zainab-013) |
 | `gitscribe` | Gitscribe tool done | [`bcc0c29`](https://github.com/InfX2243/open-source-tools-rosp/commit/bcc0c29) | [@Zainab-013](https://github.com/Zainab-013) |
 | `tokencost` | Complete tokencost implementation | [`a1c1133`](https://github.com/InfX2243/open-source-tools-rosp/commit/a1c1133) | [@Zainab-013](https://github.com/Zainab-013) |
 | `curlcraft` | Complete curlcraft implementation | [`33171dc`](https://github.com/InfX2243/open-source-tools-rosp/commit/33171dc) | [@Zainab-013](https://github.com/Zainab-013) |
