@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitScribe ✒️ — Automated Git Changelog & PDF Release Studio</title>
+  <meta name="description" content="Generate beautiful Markdown changelogs, tables, and PDF release notes from any GitHub repository link or local Git project.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0a0d14;
+      --bg-card: rgba(18, 23, 34, 0.75);
+      --bg-card-hover: rgba(24, 30, 44, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(99, 102, 241, 0.3);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 60%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 13, 20, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 5rem;
+    }
+
+    /* Header Nav */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--primary-gradient);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+    }
+
+    .brand-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-title span {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.55rem;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .header-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .btn-ghost {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+    }
+
+    .btn-ghost:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      margin-bottom: 3rem;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1rem;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 30px;
+      font-size: 0.85rem;
+      color: #c7d2fe;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .hero-title .gradient-text {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    /* Card Panels */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    /* Form Controls */
+    .input-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      color: var(--text-dim);
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+
+    .input-text {
+      width: 100%;
+      background: rgba(10, 14, 22, 0.7);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem 0.85rem 2.85rem;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .input-text:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+      background: rgba(15, 21, 32, 0.9);
+    }
+
+    .input-text::placeholder {
+      color: var(--text-dim);
+    }
+
+    .grid-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .select-custom {
+      width: 100%;
+      background: rgba(10, 14, 22, 0.7);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .select-custom:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+
+    /* Preset Chips */
+    .presets-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .preset-label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.825rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .chip:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.3);
+      color: #c7d2fe;
+    }
+
+    /* Action Buttons */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      background: var(--primary-gradient);
+      color: #ffffff;
+      border: none;
+      padding: 0.95rem 1.75rem;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 18px rgba(99, 102, 241, 0.35);
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.45);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.65rem 1.15rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Stats Bar */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: rgba(18, 23, 34, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+      background: rgba(24, 30, 44, 0.8);
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Output Section */
+    .tabs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.5rem 1rem;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      color: #ffffff;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Markdown Rendered Styling */
+    .markdown-body {
+      background: rgba(10, 14, 22, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      font-size: 0.95rem;
+      overflow-x: auto;
+    }
+
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+      color: var(--text-main);
+      margin-top: 1.5rem;
+      margin-bottom: 0.85rem;
+      font-weight: 700;
+    }
+
+    .markdown-body h1 {
+      font-size: 1.75rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      margin-top: 0;
+    }
+
+    .markdown-body h2 {
+      font-size: 1.35rem;
+      color: #c7d2fe;
+    }
+
+    .markdown-body h3 {
+      font-size: 1.15rem;
+    }
+
+    .markdown-body p, .markdown-body ul {
+      margin-bottom: 1rem;
+      color: var(--text-muted);
+    }
+
+    .markdown-body blockquote {
+      border-left: 4px solid var(--primary);
+      background: rgba(99, 102, 241, 0.08);
+      padding: 0.75rem 1.25rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      color: #c7d2fe;
+      margin-bottom: 1.25rem;
+    }
+
+    .markdown-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+    }
+
+    .markdown-body th {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .markdown-body td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .markdown-body tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .markdown-body code {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      color: #e0e7ff;
+    }
+
+    .markdown-body a {
+      color: #818cf8;
+      text-decoration: none;
+    }
+
+    .markdown-body a:hover {
+      text-decoration: underline;
+    }
+
+    /* Raw Code Block */
+    .raw-textarea {
+      width: 100%;
+      height: 480px;
+      background: rgba(10, 14, 22, 0.8);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      color: #e2e8f0;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      line-height: 1.6;
+      resize: vertical;
+      white-space: pre;
+    }
+
+    .raw-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* Guide Section */
+    .guide-card {
+      background: rgba(18, 23, 34, 0.5);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
+      margin-top: 3.5rem;
+    }
+
+    .guide-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .guide-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .guide-subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .step-box {
+      background: rgba(10, 14, 22, 0.7);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #c7d2fe;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .step-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      flex-grow: 1;
+    }
+
+    .cmd-box {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #93c5fd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      word-break: break-all;
+    }
+
+    .cmd-copy {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+
+    .cmd-copy:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Print Styles for PDF */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        background-image: none !important;
+      }
+      header, .hero, .input-card, .guide-card, .tabs-header, .brand-badge {
+        display: none !important;
+      }
+      .container {
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      .card {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+      }
+      .markdown-body {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        color: #000000 !important;
+      }
+      .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+        color: #000000 !important;
+      }
+      .markdown-body th {
+        background: #f1f5f9 !important;
+        color: #000000 !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+      .markdown-body td {
+        border: 1px solid #cbd5e1 !important;
+        color: #334155 !important;
+      }
+      .markdown-body a {
+        color: #2563eb !important;
+      }
+      .markdown-body blockquote {
+        background: #f8fafc !important;
+        border-left: 4px solid #6366f1 !important;
+        color: #334155 !important;
+      }
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #ffffff;
+      animation: spin 0.8s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <a href="#" class="brand">
+        <div class="brand-icon">✒️</div>
+        <div class="brand-title">
+          <span>GitScribe</span> Studio
+          <span class="brand-badge">v1.0.0</span>
+        </div>
+      </a>
+      <div class="header-links">
+        <a href="#guide" class="btn-ghost">Integration Guide</a>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn-ghost">GitHub ↗</a>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-pill">
+        <span>✨</span> Powered by Conventional Commits & GitHub REST API
+      </div>
+      <h1 class="hero-title">
+        Automated Git Changelogs &amp;<br>
+        <span class="gradient-text">PDF Release Notes</span> in Seconds
+      </h1>
+      <p class="hero-sub">
+        Paste any public or private GitHub repository link to fetch commits, generate structured table-formatted release notes, and download as Markdown or PDF.
+      </p>
+    </section>
+
+    <!-- Interactive Generator Form Card -->
+    <div class="card input-card">
+      <div class="card-header">
+        <div class="card-title">
+          <span>🔗</span> Enter GitHub Repository Link
+        </div>
+        <span style="font-size: 0.85rem; color: var(--text-dim);">No sign-up or installation required</span>
+      </div>
+
+      <div class="input-group">
+        <label class="label" for="repoUrlInput">Repository URL or "owner/repo"</label>
+        <div class="input-wrapper">
+          <span class="input-icon">📂</span>
+          <input 
+            type="text" 
+            id="repoUrlInput" 
+            class="input-text" 
+            placeholder="e.g. facebook/react or https://github.com/owner/repository" 
+            value=""
+          >
+        </div>
+      </div>
+
+      <!-- Quick Presets -->
+      <div class="presets-container">
+        <span class="preset-label">Try Presets:</span>
+        <button class="chip" onclick="setPreset('facebook/react')">⚛️ React</button>
+        <button class="chip" onclick="setPreset('fastapi/fastapi')">🚀 FastAPI</button>
+        <button class="chip" onclick="setPreset('vitejs/vite')">⚡ Vite</button>
+        <button class="chip" onclick="setPreset('microsoft/vscode')">💻 VS Code</button>
+      </div>
+
+      <!-- Options Grid -->
+      <div class="grid-options">
+        <div>
+          <label class="label" for="versionInput">Release Version</label>
+          <input type="text" id="versionInput" class="input-text" style="padding-left: 1rem;" value="v1.0.0">
+        </div>
+        <div>
+          <label class="label" for="styleInput">Format Layout</label>
+          <select id="styleInput" class="select-custom">
+            <option value="table" selected>📊 Clean Markdown Table (Recommended)</option>
+            <option value="list">📝 Bulleted List</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="tokenInput">GitHub Token (Optional for private repos)</label>
+          <input type="password" id="tokenInput" class="input-text" style="padding-left: 1rem;" placeholder="ghp_xxxxxxxxxxxx">
+        </div>
+      </div>
+
+      <button id="generateBtn" class="btn-primary" onclick="generateChangelog()">
+        <span id="btnIcon">⚡</span>
+        <span id="btnText">Fetch Commits &amp; Generate Changelog</span>
+      </button>
+    </div>
+
+    <!-- Live Stats Bar (Hidden until generated) -->
+    <div id="statsBar" class="stats-grid" style="display: none;">
+      <div class="stat-card">
+        <div id="statTotalCommits" class="stat-value" style="color: #818cf8;">0</div>
+        <div class="stat-label">Commits Scribed</div>
+      </div>
+      <div class="stat-card">
+        <div id="statFeatures" class="stat-value" style="color: #34d399;">0</div>
+        <div class="stat-label">Features / Tools</div>
+      </div>
+      <div class="stat-card">
+        <div id="statFixes" class="stat-value" style="color: #f87171;">0</div>
+        <div class="stat-label">Bug Fixes</div>
+      </div>
+      <div class="stat-card">
+        <div id="statContributors" class="stat-value" style="color: #f472b6;">0</div>
+        <div class="stat-label">Contributors</div>
+      </div>
+    </div>
+
+    <!-- Output Preview Section -->
+    <div id="outputCard" class="card" style="display: none;">
+      <div class="tabs-header">
+        <div class="tabs-nav">
+          <button id="tabVisualBtn" class="tab-btn active" onclick="switchTab('visual')">👁️ Formatted Preview</button>
+          <button id="tabRawBtn" class="tab-btn" onclick="switchTab('raw')">📄 Raw Markdown</button>
+        </div>
+        <div class="export-buttons">
+          <button class="btn-secondary" onclick="copyMarkdown()">📋 Copy</button>
+          <button class="btn-secondary" onclick="downloadMarkdown()">📥 Download .md</button>
+          <button class="btn-secondary" style="border-color: rgba(99, 102, 241, 0.5); color: #c7d2fe;" onclick="exportToPdf()">🖨️ Export PDF</button>
+        </div>
+      </div>
+
+      <!-- Tab 1: Rendered HTML Visual -->
+      <div id="tabVisual" class="tab-content active">
+        <div id="markdownPreview" class="markdown-body"></div>
+      </div>
+
+      <!-- Tab 2: Raw Markdown Textarea -->
+      <div id="tabRaw" class="tab-content">
+        <textarea id="rawMarkdownText" class="raw-textarea" readonly></textarea>
+      </div>
+    </div>
+
+    <!-- Step-by-Step Integration Guide -->
+    <section id="guide" class="guide-card">
+      <div class="guide-header">
+        <h2 class="guide-title">🛠️ How to Add GitScribe to ANY Local Project / Idle Folder</h2>
+        <p class="guide-subtitle">Follow these quick steps to set up automated zero-command changelogs in any folder or repository.</p>
+      </div>
+
+      <div class="steps-grid">
+        <!-- Step 1 -->
+        <div class="step-box">
+          <div class="step-badge">1</div>
+          <h3 class="step-title">Copy the `gitscribe` Folder</h3>
+          <p class="step-desc">
+            Copy the lightweight, zero-dependency <code>gitscribe/</code> directory directly into your project root. It requires no installation or external packages!
+          </p>
+          <div class="cmd-box">
+            <span>cp -r /path/to/gitscribe/ ./</span>
+            <button class="cmd-copy" onclick="copyCode('cp -r gitscribe/ ./')">Copy</button>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-box">
+          <div class="step-badge">2</div>
+          <h3 class="step-title">One-Click Auto Hook Setup</h3>
+          <p class="step-desc">
+            Run this command inside your project. It configures Git so that whenever you make a commit, <code>CHANGELOG.md</code> updates automatically!
+          </p>
+          <div class="cmd-box">
+            <span>python gitscribe/gitscribe.py --install-hook</span>
+            <button class="cmd-copy" onclick="copyCode('python gitscribe/gitscribe.py --install-hook')">Copy</button>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-box">
+          <div class="step-badge">3</div>
+          <h3 class="step-title">Or Run Real-Time Watch Mode</h3>
+          <p class="step-desc">
+            While coding, start the real-time background watcher. As soon as you commit or pull, it immediately regenerates the changelog tables!
+          </p>
+          <div class="cmd-box">
+            <span>python gitscribe/gitscribe.py --watch</span>
+            <button class="cmd-copy" onclick="copyCode('python gitscribe/gitscribe.py --watch')">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Command Cheat Sheet -->
+      <div style="background: rgba(10, 14, 22, 0.8); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.5rem;">
+        <h4 style="margin-bottom: 1rem; color: #c7d2fe; font-size: 1.05rem;">⚡ Essential GitScribe CLI Cheat Sheet</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+          <div>
+            <span style="font-size: 0.85rem; color: var(--text-dim); display: block; margin-bottom: 0.35rem;">Generate Table Changelog:</span>
+            <div class="cmd-box">
+              <span>python gitscribe/gitscribe.py --version v1.0.0</span>
+              <button class="cmd-copy" onclick="copyCode('python gitscribe/gitscribe.py --version v1.0.0')">Copy</button>
+            </div>
+          </div>
+          <div>
+            <span style="font-size: 0.85rem; color: var(--text-dim); display: block; margin-bottom: 0.35rem;">Prepend to Existing CHANGELOG.md:</span>
+            <div class="cmd-box">
+              <span>python gitscribe/gitscribe.py -v v1.1.0 -o CHANGELOG.md -p</span>
+              <button class="cmd-copy" onclick="copyCode('python gitscribe/gitscribe.py -v v1.1.0 -o CHANGELOG.md -p')">Copy</button>
+            </div>
+          </div>
+          <div>
+            <span style="font-size: 0.85rem; color: var(--text-dim); display: block; margin-bottom: 0.35rem;">Launch this Web Studio Locally:</span>
+            <div class="cmd-box">
+              <span>python gitscribe/gitscribe.py --ui</span>
+              <button class="cmd-copy" onclick="copyCode('python gitscribe/gitscribe.py --ui')">Copy</button>
+            </div>
+          </div>
+          <div>
+            <span style="font-size: 0.85rem; color: var(--text-dim); display: block; margin-bottom: 0.35rem;">Generate Machine-Readable JSON:</span>
+            <div class="cmd-box">
+              <span>python gitscribe/gitscribe.py --json -o release.json</span>
+              <button class="cmd-copy" onclick="copyCode('python gitscribe/gitscribe.py --json -o release.json')">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    let generatedMarkdown = "";
+
+    function setPreset(repo) {
+      document.getElementById('repoUrlInput').value = repo;
+    }
+
+    function switchTab(tab) {
+      document.getElementById('tabVisual').classList.toggle('active', tab === 'visual');
+      document.getElementById('tabRaw').classList.toggle('active', tab === 'raw');
+      document.getElementById('tabVisualBtn').classList.toggle('active', tab === 'visual');
+      document.getElementById('tabRawBtn').classList.toggle('active', tab === 'raw');
+    }
+
+    function parseRepoInput(input) {
+      input = input.trim();
+      input = input.replace(/\.git$/, '');
+      if (input.includes('github.com/')) {
+        const parts = input.split('github.com/')[1].split('/');
+        return { owner: parts[0], repo: parts[1] };
+      }
+      if (input.includes('/')) {
+        const parts = input.split('/');
+        return { owner: parts[0], repo: parts[1] };
+      }
+      return null;
+    }
+
+    async function generateChangelog() {
+      const repoInput = document.getElementById('repoUrlInput').value;
+      const version = document.getElementById('versionInput').value.trim() || 'v1.0.0';
+      const style = document.getElementById('styleInput').value;
+      const token = document.getElementById('tokenInput').value.trim();
+
+      const parsed = parseRepoInput(repoInput);
+      if (!parsed) {
+        alert("Please enter a valid GitHub repository in the format: owner/repo or https://github.com/owner/repo");
+        return;
+      }
+
+      const btn = document.getElementById('generateBtn');
+      const btnIcon = document.getElementById('btnIcon');
+      const btnText = document.getElementById('btnText');
+
+      btn.disabled = true;
+      btnIcon.innerHTML = `<span class="spinner"></span>`;
+      btnText.textContent = `Fetching commits from ${parsed.owner}/${parsed.repo}...`;
+
+      try {
+        const headers = {
+          'Accept': 'application/vnd.github.v3+json'
+        };
+        if (token) {
+          headers['Authorization'] = `token ${token}`;
+        }
+
+        const url = `https://api.github.com/repos/${parsed.owner}/${parsed.repo}/commits?per_page=100`;
+        const res = await fetch(url, { headers });
+
+        if (!res.ok) {
+          if (res.status === 404) {
+            throw new Error(`Repository "${parsed.owner}/${parsed.repo}" not found or is private.`);
+          }
+          if (res.status === 403) {
+            throw new Error(`GitHub API rate limit exceeded. Please provide a GitHub Personal Access Token in the options.`);
+          }
+          throw new Error(`GitHub API Error: ${res.statusText}`);
+        }
+
+        const commitsData = await res.json();
+        if (!Array.isArray(commitsData) || commitsData.length === 0) {
+          throw new Error("No commits found in this repository.");
+        }
+
+        // Process and categorize commits
+        const repoUrl = `https://github.com/${parsed.owner}/${parsed.repo}`;
+        const processed = processCommits(commitsData, repoUrl);
+
+        // Render Markdown
+        generatedMarkdown = renderMarkdown(version, processed, repoUrl, style);
+
+        // Update UI
+        document.getElementById('markdownPreview').innerHTML = marked.parse(generatedMarkdown);
+        document.getElementById('rawMarkdownText').value = generatedMarkdown;
+
+        // Update Stats
+        document.getElementById('statTotalCommits').textContent = processed.commits.length;
+        document.getElementById('statFeatures').textContent = processed.featCount;
+        document.getElementById('statFixes').textContent = processed.fixCount;
+        document.getElementById('statContributors').textContent = processed.authors.size;
+
+        document.getElementById('statsBar').style.display = 'grid';
+        document.getElementById('outputCard').style.display = 'block';
+
+        // Scroll smoothly to output
+        document.getElementById('statsBar').scrollIntoView({ behavior: 'smooth' });
+
+      } catch (err) {
+        alert("❌ " + err.message);
+      } finally {
+        btn.disabled = false;
+        btnIcon.textContent = '⚡';
+        btnText.textContent = 'Fetch Commits & Generate Changelog';
+      }
+    }
+
+    function processCommits(rawCommits, repoUrl) {
+      const commits = [];
+      const authors = new Set();
+      let featCount = 0;
+      let fixCount = 0;
+      let breakingCount = 0;
+
+      const conventionalRegex = /^([a-zA-Z]+)(?:\(([^)]+)\))?(!)?:\s*(.+)$/;
+
+      for (const item of rawCommits) {
+        // Skip merge commits
+        if (item.parents && item.parents.length > 1) continue;
+
+        const hash = item.sha;
+        const shortHash = hash.substring(0, 7);
+        const author = item.author?.login || item.commit?.author?.name || 'contributor';
+        authors.add(author);
+
+        const rawMsg = item.commit?.message || '';
+        const lines = rawMsg.split('\n');
+        const firstLine = lines[0].trim();
+
+        let type = 'other';
+        let scope = null;
+        let isBreaking = false;
+        let subject = firstLine;
+
+        if (rawMsg.includes('BREAKING CHANGE:') || rawMsg.includes('BREAKING-CHANGE:')) {
+          isBreaking = true;
+          breakingCount++;
+        }
+
+        const match = firstLine.match(conventionalRegex);
+        if (match) {
+          type = match[1].toLowerCase();
+          scope = match[2] || null;
+          if (match[3]) {
+            isBreaking = true;
+            breakingCount++;
+          }
+          subject = match[4].trim();
+        } else {
+          // Heuristic
+          const lower = firstLine.toLowerCase();
+          if (lower.startsWith('fix') || lower.startsWith('patch') || lower.startsWith('bug')) {
+            type = 'fix';
+          } else if (lower.startsWith('feat') || lower.startsWith('add') || lower.startsWith('new')) {
+            type = 'feat';
+          } else if (lower.startsWith('doc') || lower.startsWith('readme')) {
+            type = 'docs';
+          } else if (lower.startsWith('refactor') || lower.startsWith('clean')) {
+            type = 'refactor';
+          } else if (lower.startsWith('test')) {
+            type = 'test';
+          } else if (lower.startsWith('perf')) {
+            type = 'perf';
+          } else if (lower.startsWith('chore') || lower.startsWith('bump') || lower.includes('config')) {
+            type = 'chore';
+          }
+        }
+
+        if (type === 'feat') featCount++;
+        if (type === 'fix') fixCount++;
+
+        // Auto-capitalize
+        if (subject && subject.length > 1) {
+          subject = subject.charAt(0).toUpperCase() + subject.slice(1);
+        }
+
+        commits.push({
+          hash,
+          shortHash,
+          author,
+          type,
+          scope,
+          subject,
+          isBreaking,
+        });
+      }
+
+      return {
+        commits,
+        authors,
+        featCount,
+        fixCount,
+        breakingCount
+      };
+    }
+
+    function renderMarkdown(version, processed, repoUrl, style) {
+      const today = new Date().toISOString().split('T')[0];
+      const cleanVer = version.startsWith('v') ? version : `v${version}`;
+
+      let md = `# 📜 Project Changelog\n\n`;
+      md += `> All notable changes and version milestones for this repository are documented here.\n`;
+      md += `> Generated by [GitScribe Studio](${repoUrl}) • Adheres to [Keep a Changelog](https://keepachangelog.com/) & [Semantic Versioning](https://semver.org/).\n\n`;
+      md += `---\n\n`;
+      md += `## 🏷️ [${cleanVer}] — ${today}\n\n`;
+      md += `> 📦 **Release:** \`${cleanVer}\` &nbsp;•&nbsp; 📅 **Date:** \`${today}\` &nbsp;•&nbsp; 🔨 **Commits:** \`${processed.commits.length}\` &nbsp;•&nbsp; 👥 **Contributors:** \`${processed.authors.size}\`\n\n`;
+
+      const categories = [
+        { key: 'feat', title: '🚀 New Features & Tools' },
+        { key: 'fix', title: '🐛 Bug Fixes & Stability' },
+        { key: 'perf', title: '⚡ Performance Improvements' },
+        { key: 'docs', title: '📚 Documentation' },
+        { key: 'refactor', title: '♻️ Refactoring & Code Quality' },
+        { key: 'test', title: '🧪 Tests & QA' },
+        { key: 'chore', title: '🔧 Maintenance & Configuration' },
+        { key: 'other', title: '✨ Other Improvements' }
+      ];
+
+      for (const cat of categories) {
+        const catCommits = processed.commits.filter(c => c.type === cat.key);
+        if (catCommits.length === 0) continue;
+
+        md += `### ${cat.title}\n\n`;
+
+        if (style === 'table') {
+          md += `| Component | Description | Commit | Author |\n`;
+          md += `| :--- | :--- | :---: | :--- |\n`;
+          for (const c of catCommits) {
+            const scopeVal = c.scope ? `\`${c.scope}\`` : `*core*`;
+            const commitLink = `[\`${c.shortHash}\`](${repoUrl}/commit/${c.shortHash})`;
+            const authorLink = `[@${c.author}](https://github.com/${c.author})`;
+            const cleanDesc = c.subject.replace(/\|/g, '\\|');
+            md += `| ${scopeVal} | ${cleanDesc} | ${commitLink} | ${authorLink} |\n`;
+          }
+        } else {
+          for (const c of catCommits) {
+            const scopeVal = c.scope ? `**\`${c.scope}\`** ` : '';
+            const commitLink = `[\`${c.shortHash}\`](${repoUrl}/commit/${c.shortHash})`;
+            const authorLink = `([@${c.author}](https://github.com/${c.author}))`;
+            md += `- ${scopeVal}${c.subject} • ${commitLink} ${authorLink}\n`;
+          }
+        }
+        md += `\n`;
+      }
+
+      // Contributors
+      md += `### 👥 Contributors\n\n`;
+      const authorList = Array.from(processed.authors).sort();
+      const authorLinks = authorList.map(a => `[@${a}](https://github.com/${a})`).join(', ');
+      md += `Thank you to our contributors for this release: ${authorLinks}!\n`;
+
+      return md;
+    }
+
+    function copyMarkdown() {
+      navigator.clipboard.writeText(generatedMarkdown).then(() => {
+        alert("✅ Copied changelog markdown to clipboard!");
+      });
+    }
+
+    function downloadMarkdown() {
+      const blob = new Blob([generatedMarkdown], { type: 'text/markdown;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'CHANGELOG.md');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function exportToPdf() {
+      // Trigger native browser print which formats automatically for PDF export
+      window.print();
+    }
+
+    function copyCode(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert(`✅ Copied to clipboard:\n${text}`);
+      });
+    }
+
+    // Clean initial state (no auto-query of user repo)
+    window.addEventListener('DOMContentLoaded', () => {
+      // Focus the input field for immediate typing
+      const input = document.getElementById('repoUrlInput');
+      if (input) input.focus();
+    });
+  </script>
+</body>
+</html>

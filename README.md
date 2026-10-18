@@ -25,6 +25,7 @@
   - [8. 🪙 TokenCost — AI Prompt, Token Cost & Latency Playground](#8--tokencost--ai-prompt-token-cost--latency-playground)
   - [9. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation](#9--treesnapshot--filesystem-to-tree-markdown-documentation)
   - [10. 🛡️ EnvGuard — Environment & Secret Governance](#10-️-envguard--environment--secret-governance)
+  - [11. ✒️ GitScribe — Automated Git Changelog & Release Notes Generator](#11-️-gitscribe--automated-git-changelog--release-notes-generator)
 - [ScaffoldTree + TreeSnapshot Workflow](#-the-scaffoldtree--treesnapshot-duo)
 - [Repository Structure](#-repository-structure)
 - [Local Setup & Testing Guide](#-local-setup--testing-guide)
@@ -57,6 +58,7 @@ The **ROSP Open-Source Tools Suite** solves real-world pain points across modern
 | **[TokenCost](./tokencost)** | AI Engineering & LLM Tooling | React 18, Vite, Prism.js | Real-time token counter, multi-model cost benchmark (GPT-4o, Claude 3.5, Gemini, DeepSeek), variable templating & SDK exporter. | [`/tokencost`](./tokencost) |
 | **[TreeSnapshot](./TreeSnapshot)** | Documentation & Tooling | Python 3.8+ (Zero Deps) | Traverses any directory and captures an accurate, clean Markdown-friendly tree with `.treeignore` support. | [`/TreeSnapshot`](./TreeSnapshot) |
 | **[EnvGuard](./envguard)** | Config, Secrets & Governance | Python, Rich, Typer, FastAPI | Validates .env schemas/drift, scans codebases to auto-generate .env.example, performs redacted diffing, catches secret leaks, and includes an interactive Web Dashboard (`envguard ui`). | [`/envguard`](./envguard) |
+| **[GitScribe](./gitscribe)** | Git & Release Automation | Python 3.8+ (Zero Deps) | Generates structured Markdown changelogs, GitHub release drafts, and JSON summaries from Git commit histories with Conventional Commits parsing. | [`/gitscribe`](./gitscribe) |
 
 ---
 
@@ -329,6 +331,39 @@ envguard ui
 
 ---
 
+### 11. ✒️ GitScribe — Automated Git Changelog & Release Notes Generator
+> *Zero-dependency Git commit history parser and professional changelog generator.*
+
+#### 💡 Why It Is Useful
+Writing release notes and keeping `CHANGELOG.md` updated before tagging releases is repetitive, manual, and often forgotten. GitScribe automates the entire process with zero external dependencies, parsing Conventional Commits, detecting breaking changes, and auto-linking GitHub/GitLab issues.
+
+#### 🚀 Key Capabilities
+- **Conventional Commits Engine**: Parses and categorizes `feat`, `fix`, `perf`, `docs`, `refactor`, `test`, `build`, `ci`, and `chore`.
+- **Breaking Change Detection**: Identifies `feat!:` and `BREAKING CHANGE:` blocks, highlighting them at the top of the changelog.
+- **Smart Prepend Mode (`-p` / `--prepend`)**: Inserts new release notes directly at the top of an existing `CHANGELOG.md` without overwriting historical logs.
+- **Issue & PR Auto-Linking**: Converts `#123` or `GH-45` into clickable GitHub links based on remote URL.
+- **GitHub Release Drafts (`--release-notes`)**: Generates clean Markdown ready for GitHub Releases or CI/CD pipelines.
+- **Machine-Readable JSON (`--json`)**: Exports metadata for Slack/Discord release webhooks.
+
+#### ⚡ Quick Command
+```bash
+cd gitscribe
+
+# Generate changelog for latest commits
+python gitscribe.py
+
+# Name version v1.2.0 and prepend to existing CHANGELOG.md
+python gitscribe.py --version v1.2.0 --output CHANGELOG.md --prepend
+
+# Launch the interactive Web Studio Dashboard
+python gitscribe.py --ui
+
+# Output only the release notes block for GitHub Releases
+python gitscribe.py --version v1.2.0 --release-notes
+```
+
+---
+
 ## 🔄 The ScaffoldTree + TreeSnapshot Duo
 
 Together, **TreeSnapshot** and **ScaffoldTree** form a complete, bi-directional project templating and documentation loop:
@@ -413,6 +448,13 @@ open-source-tools-rosp/
 │   ├── .treeignore            # Default ignore rules
 │   ├── directory_structure.md # Generated snapshot output
 │   └── README.md              # TreeSnapshot documentation
+│
+├── gitscribe/                 # ✒️ Git Changelog & Release Notes Generator
+│   ├── gitscribe.py           # Core generator engine (zero dependencies)
+│   ├── tests/                 # Unit test suite for commit parsing & rendering
+│   ├── examples/              # Sample generated changelog & release drafts
+│   ├── pyproject.toml         # Package build & dependency metadata
+│   └── README.md              # GitScribe documentation
 │
 └── README.md                  # Unified suite documentation (this file)
 ```
