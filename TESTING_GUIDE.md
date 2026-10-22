@@ -1,8 +1,9 @@
 # OpenForge Master Functional Testing & Screenshot Guide
 
-This guide walks you through executing each of the 10 tools using the dedicated test fixtures located in [`sample_testing_suite/`](./sample_testing_suite). 
+This guide walks you through executing each of the 12 tools using the dedicated test fixtures located in [`sample_testing_suite/`](./sample_testing_suite). 
 
-Drop your captured screenshots into the [`screenshots/`](./screenshots) directory. When you re-run `python generate_report_docx.py`, your images will automatically be embedded under **Section 4.3 (Figure 4.1 to Figure 4.10)** in the Word report!
+Drop your captured screenshots into the [`screenshots/`](./screenshots) directory. When you re-run `python generate_report_docx.py`, your images will automatically be embedded under **Section 4.3 (Figure 4.1 to Figure 4.12)** in the Word report!
+
 
 ---
 
@@ -156,9 +157,53 @@ Drop your captured screenshots into the [`screenshots/`](./screenshots) director
 
 ---
 
+## Tool 11: RepoHealth
+* **Test Focus:** 360-Degree Open-Source Repository Readiness, Health Grading (A+ to F), and Web Studio Audit
+* **Sample Files:** [`sample_testing_suite/repohealth_test/`](./sample_testing_suite/repohealth_test)
+* **Execution Commands:**
+  1. **CLI Quality Audit & Gate:**
+     ```powershell
+     cd repohealth
+     python repohealth.py ../sample_testing_suite/repohealth_test
+     # Enforce Quality Gate (fails if score < 80%)
+     python repohealth.py ../sample_testing_suite/repohealth_test --fail-under 80
+     ```
+  2. **Interactive Web Studio Dashboard:**
+     ```powershell
+     python repohealth.py --ui
+     ```
+     *(Or double-click `repohealth/web/index.html` directly in your browser)*
+* **Screenshot Action:** Capture the terminal showing the RepoHealth score calculation (Grade, category breakdowns, and recommended template fixes) or the interactive Web Studio gauge showing real-time repository health and 1-click template fixes.
+* **Save As:** `screenshots/test_repohealth.png` (or `.jpg`)
+
+---
+
+## Tool 12: GitScribe
+* **Test Focus:** Conventional Commits Extraction, Markdown Table Generation, Git Hooks & Release Notes Studio
+* **Sample Files:** [`sample_testing_suite/gitscribe_test/sample_commits.txt`](./sample_testing_suite/gitscribe_test/sample_commits.txt)
+* **Execution Commands:**
+  1. **CLI Changelog Generation:**
+     ```powershell
+     cd gitscribe
+     # Generate clean Markdown Table Changelog
+     python gitscribe.py --version v1.0.0 -o CHANGELOG_TEST.md
+     # Test Git Hook zero-command automation
+     python gitscribe.py --install-hook
+     ```
+  2. **Interactive Web Studio Dashboard:**
+     ```powershell
+     python gitscribe.py --ui
+     ```
+     *(Or double-click `gitscribe/web/index.html` directly in your browser)*
+* **Screenshot Action:** Capture the terminal confirming generated table-formatted changelog with categorized commits, or the Web Studio dashboard showing real-time commit metrics (Features, Fixes, Contributors) and one-click PDF / Markdown export buttons.
+* **Save As:** `screenshots/test_gitscribe.png` (or `.jpg`)
+
+---
+
 ## Compiling Your Final Report with Screenshots
 Whenever you add or update screenshots in `screenshots/`, run:
 ```powershell
 python generate_report_docx.py
 ```
 Your images will be automatically placed into the Word document under each corresponding tool test case!
+

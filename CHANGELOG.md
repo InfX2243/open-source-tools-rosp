@@ -5,9 +5,9 @@
 
 ---
 
-## 🏷️ [v1.0.0] — 2026-10-18
+## 🏷️ [v1.0.0] — 2026-10-22
 
-> 📦 **Release:** `v1.0.0` &nbsp;•&nbsp; 📅 **Date:** `2026-10-18` &nbsp;•&nbsp; 🔨 **Commits:** `15` &nbsp;•&nbsp; 👥 **Contributors:** `3`
+> 📦 **Release:** `v1.0.0` &nbsp;•&nbsp; 📅 **Date:** `2026-10-22` &nbsp;•&nbsp; 🔨 **Commits:** `17` &nbsp;•&nbsp; 👥 **Contributors:** `3`
 
 ### 🚀 New Features & Tools
 
@@ -32,7 +32,14 @@
 
 | Component | Description | Commit | Author |
 | :--- | :--- | :---: | :--- |
+| `changelog` | Auto-update CHANGELOG.md [skip ci] | [`eff3e9d`](https://github.com/InfX2243/open-source-tools-rosp/commit/eff3e9d) | [@Zainab-013](https://github.com/Zainab-013) |
 | `changelog` | Auto-update CHANGELOG.md [skip ci] | [`ff62581`](https://github.com/InfX2243/open-source-tools-rosp/commit/ff62581) | [@Zainab-013](https://github.com/Zainab-013) |
+
+### 🧪 Tests & QA
+
+| Component | Description | Commit | Author |
+| :--- | :--- | :---: | :--- |
+| *core* | Testing files | [`01ddc5f`](https://github.com/InfX2243/open-source-tools-rosp/commit/01ddc5f) | [@yashfeenraavi09](https://github.com/yashfeenraavi09) |
 
 ### 🔧 Maintenance & Configuration
 

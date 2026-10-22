@@ -1,0 +1,7 @@
+feat(auth): implement OAuth2 PKCE login flow (#101)
+fix(api): prevent null pointer exception on missing user token (#102)
+perf(query): add indexing to repository commit lookup (#103)
+feat(export)!: overhaul release notes schema to unified JSON format
+BREAKING CHANGE: The export flag --format legacy is deprecated. Use --style table instead.
+docs(readme): add installation guide and usage screenshots
+chore(deps): bump cryptographic libraries to 3.2.0

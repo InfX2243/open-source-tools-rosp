@@ -12,5 +12,8 @@ Place your test screenshots in this folder with the following filenames:
 8. `test_tokencost.png` (or `.jpg`) - TokenCost prompt matrix and multi-model pricing
 9. `test_treesnapshot.png` (or `.jpg`) - TreeSnapshot markdown directory tree output
 10. `test_envguard.png` (or `.jpg`) - EnvGuard drift audit and secret detection results
+11. `test_repohealth.png` (or `.jpg`) - RepoHealth readiness score, grade gauge & checklist
+12. `test_gitscribe.png` (or `.jpg`) - GitScribe table changelog & Web Studio release notes
 
 When you re-run `python generate_report_docx.py`, these images will be automatically embedded under each tool in Section 4.3!
+
