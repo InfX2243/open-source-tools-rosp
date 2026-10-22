@@ -1,43 +1,26 @@
-# Directory Structure for `C:\Users\ADMIN\Documents\ModelSmith\open-source-tools-rosp\tree_snapshot\my-web-app`
+# Directory Structure for `C:\Users\YASHFEEN RAAVI\Downloads\open-source-tools-rosp\sample_testing_suite`
 
 ```text
-my-web-app/
-└── src/
-    ├── components/
-    │   ├── Button.tsx
-    │   ├── index.ts
-    │   └── Modal.tsx
-    ├── pages/
-    │   ├── About.tsx
-    │   ├── Home.tsx
-    │   └── NotFound.tsx
-    ├── public/
-    │   ├── images/
-    │   │   └── logo.svg
-    │   ├── tests/
-    │   │   ├── components/
-    │   │   │   └── Button.test.tsx
-    │   │   ├── docs/
-    │   │   │   ├── config/
-    │   │   │   │   ├── .env
-    │   │   │   │   ├── .gitignore
-    │   │   │   │   ├── development.yaml
-    │   │   │   │   ├── Dockerfile
-    │   │   │   │   ├── Makefile
-    │   │   │   │   ├── package.json
-    │   │   │   │   ├── production.yaml
-    │   │   │   │   ├── README
-    │   │   │   │   └── tsconfig.json
-    │   │   │   ├── architecture.md
-    │   │   │   └── README.md
-    │   │   └── utils/
-    │   │       └── format.test.ts
-    │   └── favicon.ico
-    ├── styles/
-    │   ├── globals.css
-    │   └── variables.css
-    ├── utils/
-    │   ├── api.ts
-    │   └── format.ts
-    └── main.tsx
+sample_testing_suite/
+├── containersec_test/
+│   └── Dockerfile.test
+├── curlcraft_test/
+│   └── curl_sample.txt
+├── datadiff_test/
+│   ├── baseline.csv
+│   └── current.csv
+├── dataguard_test/
+│   ├── dirty_data.csv
+│   └── rules.yaml
+├── envguard_test/
+│   ├── .env.example.test
+│   └── .env.test
+├── json_formatter_test/
+│   └── broken_sample.json
+├── scaffoldtree_test/
+│   └── sample_tree.txt
+├── svg2jsx_test/
+│   └── sample_icon.svg
+└── tokencost_test/
+    └── prompt_sample.txt
 ```

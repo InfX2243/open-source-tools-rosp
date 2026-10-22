@@ -1,0 +1,6 @@
+user_id,email,age,membership,signup_date
+U-1001,john.doe@company.com,32,GOLD,2024-01-15
+U-1002,sarah.connor@sky.net,28,PLATINUM,2024-02-10
+U-1003,invalid-email-format,17,SILVER,2024-03-01
+U-1004,alex.smith@corp.org,45,DIAMOND,2024-03-15
+U-1001,duplicate.user@test.com,150,UNKNOWN,2024-04-01

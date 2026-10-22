@@ -1,0 +1,2 @@
+System: You are an enterprise DevSecOps code auditor specialized in container security and compliance.
+User: Please analyze the following {{language}} component located at {{file_path}}. Ensure that all credentials are sanitized and no plain-text API keys are committed. Flag any violations under {{compliance_standard}}.

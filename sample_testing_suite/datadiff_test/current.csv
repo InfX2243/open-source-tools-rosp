@@ -1,0 +1,6 @@
+id,name,role,department,salary,status
+101,Alice Johnson,Lead Architect,Cloud Platform,142000,ACTIVE
+102,Bob Smith,Senior Data Engineer,Analytics,108000,ACTIVE
+104,Diana Prince,Frontend Developer,UI Engineering,95000,ACTIVE
+105,Evan Wright,Backend Specialist,Infrastructure,110000,INACTIVE
+106,Fiona Gallagher,QA Lead,Quality Assurance,88000,ACTIVE

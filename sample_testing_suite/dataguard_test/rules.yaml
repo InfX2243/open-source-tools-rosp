@@ -1,0 +1,23 @@
+version: "1.0"
+dataset: "user_registry"
+
+rules:
+  - column: "user_id"
+    type: "unique"
+    severity: "HIGH"
+
+  - column: "email"
+    type: "regex"
+    pattern: "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"
+    severity: "HIGH"
+
+  - column: "age"
+    type: "range"
+    min: 18
+    max: 100
+    severity: "MEDIUM"
+
+  - column: "membership"
+    type: "enum"
+    values: ["SILVER", "GOLD", "PLATINUM", "DIAMOND"]
+    severity: "LOW"

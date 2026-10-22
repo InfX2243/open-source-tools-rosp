@@ -1,0 +1,18 @@
+# Vulnerable Dockerfile for ContainerSec Functional Testing
+FROM python:latest
+
+# Missing non-root user
+WORKDIR /app
+
+# Using ADD instead of COPY
+ADD https://example.com/package.tar.gz /tmp/package.tar.gz
+
+# Insecure environment variable with secret leak
+ENV AWS_SECRET_ACCESS_KEY=AKIAIOSFODNN7EXAMPLETEST
+ENV PORT=8080
+
+COPY . .
+
+# Running as root without healthcheck
+EXPOSE 8080
+CMD ["python", "app.py"]

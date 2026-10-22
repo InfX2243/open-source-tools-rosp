@@ -1,0 +1,17 @@
+{
+  // Broken JSON test: Unquoted keys, single quotes, trailing commas
+  title: 'OpenForge Developer Platform',
+  version: 2.5,
+  isActive: true,
+  tools: [
+    'ContainerSec',
+    'DataGuard',
+    'EnvGuard',
+    'CurlCraft',
+  ],
+  configuration: {
+    telemetry: false,
+    environment: 'production',
+    timeoutSeconds: 30,
+  },
+}

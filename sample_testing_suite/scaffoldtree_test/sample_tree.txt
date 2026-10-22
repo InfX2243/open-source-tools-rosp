@@ -1,0 +1,15 @@
+my_microservice/
+├── api/
+│   ├── v1/
+│   │   ├── endpoints.py
+│   │   └── models.py
+│   └── database.py
+├── core/
+│   ├── config.py
+│   └── security.py
+├── tests/
+│   ├── test_endpoints.py
+│   └── conftest.py
+├── Dockerfile
+├── requirements.txt
+└── README.md
