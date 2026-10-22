@@ -25,6 +25,8 @@
   - [8. 🪙 TokenCost — AI Prompt, Token Cost & Latency Playground](#8--tokencost--ai-prompt-token-cost--latency-playground)
   - [9. 📸 TreeSnapshot — Filesystem-to-Tree Markdown Documentation](#9--treesnapshot--filesystem-to-tree-markdown-documentation)
   - [10. 🛡️ EnvGuard — Environment & Secret Governance](#10-️-envguard--environment--secret-governance)
+  - [11. ✒️ GitScribe — Automated Git Changelog & Release Notes Generator](#11-️-gitscribe--automated-git-changelog--release-notes-generator)
+  - [12. 🏥 RepoHealth — Repository Health, Readiness & Open-Source Auditor](#12-️-repohealth--repository-health-readiness--open-source-auditor)
 - [ScaffoldTree + TreeSnapshot Workflow](#-the-scaffoldtree--treesnapshot-duo)
 - [Repository Structure](#-repository-structure)
 - [Local Setup & Testing Guide](#-local-setup--testing-guide)
@@ -57,6 +59,8 @@ The **ROSP Open-Source Tools Suite** solves real-world pain points across modern
 | **[TokenCost](./tokencost)** | AI Engineering & LLM Tooling | React 18, Vite, Prism.js | Real-time token counter, multi-model cost benchmark (GPT-4o, Claude 3.5, Gemini, DeepSeek), variable templating & SDK exporter. | [`/tokencost`](./tokencost) |
 | **[TreeSnapshot](./TreeSnapshot)** | Documentation & Tooling | Python 3.8+ (Zero Deps) | Traverses any directory and captures an accurate, clean Markdown-friendly tree with `.treeignore` support. | [`/TreeSnapshot`](./TreeSnapshot) |
 | **[EnvGuard](./envguard)** | Config, Secrets & Governance | Python, Rich, Typer, FastAPI | Validates .env schemas/drift, scans codebases to auto-generate .env.example, performs redacted diffing, catches secret leaks, and includes an interactive Web Dashboard (`envguard ui`). | [`/envguard`](./envguard) |
+| **[GitScribe](./gitscribe)** | Git & Release Automation | Python 3.8+ (Zero Deps) | Generates structured Markdown changelogs, GitHub release drafts, and JSON summaries from Git commit histories with Conventional Commits parsing. | [`/gitscribe`](./gitscribe) |
+| **[RepoHealth](./repohealth)** | Open Source & Project Readiness | Python 3.8+ (Zero Deps) | Audits documentation, licenses, Git hygiene, and CI/CD readiness with A+ to F scoring, actionable fix guides, CI quality gates, and interactive Web Dashboard. | [`/repohealth`](./repohealth) |
 
 ---
 
@@ -329,6 +333,76 @@ envguard ui
 
 ---
 
+### 11. ✒️ GitScribe — Automated Git Changelog & Release Notes Generator
+> *Zero-dependency Git commit history parser and professional changelog generator.*
+
+#### 💡 Why It Is Useful
+Writing release notes and keeping `CHANGELOG.md` updated before tagging releases is repetitive, manual, and often forgotten. GitScribe automates the entire process with zero external dependencies, parsing Conventional Commits, detecting breaking changes, and auto-linking GitHub/GitLab issues.
+
+#### 🚀 Key Capabilities
+- **Conventional Commits Engine**: Parses and categorizes `feat`, `fix`, `perf`, `docs`, `refactor`, `test`, `build`, `ci`, and `chore`.
+- **Breaking Change Detection**: Identifies `feat!:` and `BREAKING CHANGE:` blocks, highlighting them at the top of the changelog.
+- **Smart Prepend Mode (`-p` / `--prepend`)**: Inserts new release notes directly at the top of an existing `CHANGELOG.md` without overwriting historical logs.
+- **Issue & PR Auto-Linking**: Converts `#123` or `GH-45` into clickable GitHub links based on remote URL.
+- **GitHub Release Drafts (`--release-notes`)**: Generates clean Markdown ready for GitHub Releases or CI/CD pipelines.
+- **Machine-Readable JSON (`--json`)**: Exports metadata for Slack/Discord release webhooks.
+
+#### ⚡ Quick Command
+```bash
+cd gitscribe
+
+# Generate changelog for latest commits
+python gitscribe.py
+
+# Name version v1.2.0 and prepend to existing CHANGELOG.md
+python gitscribe.py --version v1.2.0 --output CHANGELOG.md --prepend
+
+# Launch the interactive Web Studio Dashboard
+python gitscribe.py --ui
+
+# Output only the release notes block for GitHub Releases
+python gitscribe.py --version v1.2.0 --release-notes
+```
+
+---
+
+### 12. 🏥 RepoHealth — Repository Health, Readiness & Open-Source Auditor
+> *Zero-dependency open-source repository auditor, readiness scorer, and interactive web dashboard.*
+
+#### 💡 Why It Is Useful
+Open-source repositories often struggle with missing licenses, inadequate documentation, unpinned dependencies, exposed credential patterns, or absent CI/CD quality gates. RepoHealth instantly inspects any local codebase or public GitHub repository, calculates an objective 100-point health score (A+ to F), produces an actionable `REPO_HEALTH.md` report, and provides 1-click template fixes to make any project production-ready and contributor-friendly.
+
+#### 🚀 Key Capabilities
+- **100% Zero External Dependencies**: Powered entirely by the Python 3.8+ standard library (`pathlib`, `urllib.request`, `json`, `http.server`).
+- **4 Core Audit Dimensions (100 Points)**:
+  - 📖 **Documentation (30 pts)**: `README.md` length & headings, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`.
+  - ⚖️ **Legal & Licensing (25 pts)**: OSI/SPDX `LICENSE` file presence, valid SPDX identifier, copyright notice.
+  - 🧹 **Git Hygiene & Security (25 pts)**: `.gitignore` verification, security audit for exposed secrets (`.env`, `*.pem`, `*.key`), and `SECURITY.md` vulnerability reporting policy.
+  - 🤖 **CI/CD & Issue Automation (20 pts)**: Automated workflows (`.github/workflows`, `.gitlab-ci.yml`), issue templates (`issue_template`), and PR templates (`pull_request_template`).
+- **CI/CD Quality Gates (`--fail-under <SCORE>`)**: Exit code `1` if health falls below target (e.g., fail builds if score < 85).
+- **Interactive Glassmorphic Web Dashboard (`--ui`)**: Real-time browser studio served on `http://127.0.0.1:8899` with live GitHub REST API audits, animated grade gauge, 1-click template copy fixes, and PDF report export.
+- **Automated SVG Badge Generator (`--badge`)**: Produces embeddable shields (`RepoHealth: 95% A+`) for project READMEs.
+- **Machine-Readable JSON (`--json`)**: Ideal for orchestrating repository health audits across entire GitHub organizations.
+
+#### ⚡ Quick Command
+```bash
+cd repohealth
+
+# Run an audit on the current repository
+python repohealth.py .
+
+# Enforce a strict CI quality gate (fail if score < 80)
+python repohealth.py . --fail-under 80
+
+# Generate an SVG badge and Markdown report
+python repohealth.py . --badge repo_health_badge.svg --output REPO_HEALTH.md
+
+# Launch the interactive Web Dashboard
+python repohealth.py --ui
+```
+
+---
+
 ## 🔄 The ScaffoldTree + TreeSnapshot Duo
 
 Together, **TreeSnapshot** and **ScaffoldTree** form a complete, bi-directional project templating and documentation loop:
@@ -414,6 +488,22 @@ open-source-tools-rosp/
 │   ├── directory_structure.md # Generated snapshot output
 │   └── README.md              # TreeSnapshot documentation
 │
+├── gitscribe/                 # ✒️ Git Changelog & Release Notes Generator
+│   ├── gitscribe.py           # Core generator engine (zero dependencies)
+│   ├── tests/                 # Unit test suite for commit parsing & rendering
+│   ├── examples/              # Sample generated changelog & release drafts
+│   ├── pyproject.toml         # Package build & dependency metadata
+│   └── README.md              # GitScribe documentation
+│
+├── repohealth/                # 🏥 Repository Health, Readiness & Open-Source Auditor
+│   ├── repohealth.py          # Core audit engine, CLI & local web server
+│   ├── web/                   # Interactive Glassmorphic Web Dashboard
+│   │   └── index.html         # Single-file HTML5/CSS3/Vanilla JS UI
+│   ├── tests/                 # Unit test suite (directory audit, scoring, secrets)
+│   ├── examples/              # Sample generated REPO_HEALTH.md reports
+│   ├── pyproject.toml         # Package build & dependency metadata
+│   └── README.md              # RepoHealth documentation
+│
 └── README.md                  # Unified suite documentation (this file)
 ```
 
@@ -449,7 +539,7 @@ cd datadiff && pip install -e . pytest && pytest && cd ..
 cd dataguard && pip install -e . pytest && pytest && cd ..
 ```
 
-### 2. Standalone Zero-Dependency Python Utilities (`ScaffoldTree`, `TreeSnapshot`)
+### 2. Standalone Zero-Dependency Python Utilities (`ScaffoldTree`, `TreeSnapshot`, `GitScribe`, `RepoHealth`)
 
 ```bash
 # Test ScaffoldTree
@@ -460,6 +550,19 @@ cd ..
 # Test TreeSnapshot
 cd TreeSnapshot
 python tree_snapshot.py ./my-web-app
+cd ..
+
+# Test GitScribe
+cd gitscribe
+python tests/test_gitscribe.py
+python gitscribe.py --ui
+cd ..
+
+# Test RepoHealth
+cd repohealth
+python tests/test_repohealth.py
+python repohealth.py .
+python repohealth.py --ui
 cd ..
 ```
 
