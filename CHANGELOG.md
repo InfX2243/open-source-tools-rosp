@@ -7,7 +7,7 @@
 
 ## 🏷️ [v1.0.0] — 2026-10-22
 
-> 📦 **Release:** `v1.0.0` &nbsp;•&nbsp; 📅 **Date:** `2026-10-22` &nbsp;•&nbsp; 🔨 **Commits:** `17` &nbsp;•&nbsp; 👥 **Contributors:** `3`
+> 📦 **Release:** `v1.0.0` &nbsp;•&nbsp; 📅 **Date:** `2026-10-22` &nbsp;•&nbsp; 🔨 **Commits:** `18` &nbsp;•&nbsp; 👥 **Contributors:** `3`
 
 ### 🚀 New Features & Tools
 
@@ -39,6 +39,7 @@
 
 | Component | Description | Commit | Author |
 | :--- | :--- | :---: | :--- |
+| *core* | Testing suite | [`5e5226f`](https://github.com/InfX2243/open-source-tools-rosp/commit/5e5226f) | [@yashfeenraavi09](https://github.com/yashfeenraavi09) |
 | *core* | Testing files | [`01ddc5f`](https://github.com/InfX2243/open-source-tools-rosp/commit/01ddc5f) | [@yashfeenraavi09](https://github.com/yashfeenraavi09) |
 
 ### 🔧 Maintenance & Configuration
